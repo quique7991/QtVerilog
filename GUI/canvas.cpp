@@ -20,7 +20,6 @@
 
 #include "canvas.h"
 #include "line.h"
-#include "modulo.h"
 #include "core.h"
 
 class ImageItem: public QGraphicsRectItem
@@ -273,33 +272,34 @@ QList<QGraphicsItem*> modulos;
 QMultiHash<int,line*> conexiones;
 
 
-void Main::addModulo(){//(int x, int y, QString nombre, int cantidadEntradas, int cantidadSalidas, QString direccionImagen, QColor color, QString *in, QString *out){
+void Main::addModulo(){//(int x, int y, QString nombre, int cantidadEntradas, int cantidadSalidas, QString direccionImagen, QColor color, QString *in, QString *out,bool force,int width,int height){
     int x=0;
     int y=0;
     QString nombre="Modulo";
+    bool force= false;
     int cantidadEntradas=5;
     int cantidadSalidas=5;
-    QString direccionImagen = "bla";
+    int width=150;
+    int height=150;
+    QString direccionImagen = "/home/quique/Desktop/portedcanvas/images.jpeg";
     QColor color = Qt::blue;
-    int minHeight = 150;
+    int minHeight = 100;
     if(cantidadEntradas>cantidadSalidas){
         minHeight = cantidadEntradas*10+8;
     }
     else{
         minHeight = cantidadSalidas*10+8;
     }
-    if(minHeight<50){
-        minHeight=50;
+    if(minHeight<100){
+        minHeight=100;
     }
     int minWidth=100;///Luego es necsario comparar la altura contra la imágen que va adentro.
+    if(force){
+        minHeight=width;
+        minWidth=height;
+    }
     //Objeto central del modulo
-    QGraphicsItem *rectangulo = new Core(x+20,y+14,direccionImagen,color,cantidadEntradas,cantidadSalidas,this);
-    /*QGraphicsRectItem *rectangulo = canvas.addRect( QRectF(x+20,y+14,minWidth,minHeight) );
-    rectangulo->setFlag(QGraphicsItem::ItemIsMovable);
-    int z = qrand()%256;
-    rectangulo->setBrush( QColor(z,z,z) );
-    rectangulo->setPen( QPen(QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8), 6) );
-    rectangulo->setZValue(z);*/
+    QGraphicsItem *rectangulo = new Core(x+20,y+14,direccionImagen,color,cantidadEntradas,cantidadSalidas,this,force,width,height);
     rectangulo->setPos(0,0);
     canvas.addItem(rectangulo);
     ///Escribir el nombre, sobre el objeto

@@ -3,7 +3,7 @@
 #include <QPainter>
 #include <QMenu>
 
-Core::Core(int left,int top,  QString direccionImagen,QColor color,int cantidadEntradas,int cantidadSalidas,Main *parent){
+Core::Core(int left,int top,  QString direccionImagen,QColor color,int cantidadEntradas,int cantidadSalidas,Main *parent,bool force,int width,int height){
    minHeight = 150;
     if(cantidadEntradas>cantidadSalidas){
         minHeight = cantidadEntradas*10+8;
@@ -11,8 +11,12 @@ Core::Core(int left,int top,  QString direccionImagen,QColor color,int cantidadE
     else{
         minHeight = cantidadSalidas*10+8;
     }
-    if(minHeight<50){
-        minHeight=50;
+    if(minHeight<100){
+        minHeight=100;
+    }
+    if(force){
+        minHeight=height;
+        minWidth=width;
     }
     z = qrand()%256;
     minWidth=100;///Luego es necsario comparar la altura contra la imágen que va adentro.
@@ -41,8 +45,10 @@ void Core::paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidge
 
     painter->setBrush( QColor(z,z,z) );
     painter->setPen( QPen(color) );
-    painter->drawLine(QPointF(1,1),QPointF(2,2));
-    painter->drawRect(QRectF(left,top,minWidth,minHeight));
+    //painter->drawLine(QPointF(1,1),QPointF(2,2));
+    //painter->drawRect(QRectF(left,top,minWidth,minHeight));
+    QPixmap *pix = new QPixmap(direccionImagen);
+    painter->drawPixmap(left,top,minWidth,minHeight,*pix);
 }
 
 void Core::mousePressEvent(QGraphicsSceneMouseEvent *event){

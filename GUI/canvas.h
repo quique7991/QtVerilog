@@ -11,8 +11,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsItem>
 #include "line.h"
+#include "core.h"
 class line;
-
+class Core;
 class Sprite : public QGraphicsPixmapItem{
 public:
     Sprite();
@@ -42,6 +43,7 @@ class Main : public QMainWindow {
 public:
     Main(QGraphicsScene&, QWidget* parent=0, Qt::WindowFlags f=0);
     ~Main();
+    int setActualItem(Core *Item);
     line *ultimo;
     bool isValid;
     bool isSecondClick;
@@ -53,6 +55,8 @@ public:
 
 public slots:
     void help();
+    void erase();
+    void downHierarchie();
 
 private slots:
     void aboutQt();
@@ -62,7 +66,6 @@ private slots:
     void init();
     void addModulo();//(int x, int y, QString nombre, int cantidadEntradas, int cantidadSalidas, QString direccionImagen, QColor color, QString *in, QString *out);
     void addSpriteMine();
-
     void enlarge();
     void shrink();
     void rotateClockwise();
@@ -80,7 +83,7 @@ private slots:
 private:
     QGraphicsScene& canvas;
     FigureEditor *editor;
-
+    Core *actualItem;
     QMenu* options;
 #if !defined(Q_OS_SYMBIAN)
     QPrinter* printer;

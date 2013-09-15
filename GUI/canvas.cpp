@@ -293,7 +293,7 @@ void Main::addModulo(){//(int x, int y, QString nombre, int cantidadEntradas, in
     }
     int minWidth=100;///Luego es necsario comparar la altura contra la imágen que va adentro.
     //Objeto central del modulo
-    QGraphicsItem *rectangulo = new Core(x+20,y+14,direccionImagen,color,cantidadEntradas,cantidadSalidas,&canvas);
+    QGraphicsItem *rectangulo = new Core(x+20,y+14,direccionImagen,color,cantidadEntradas,cantidadSalidas,this);
     /*QGraphicsRectItem *rectangulo = canvas.addRect( QRectF(x+20,y+14,minWidth,minHeight) );
     rectangulo->setFlag(QGraphicsItem::ItemIsMovable);
     int z = qrand()%256;
@@ -360,4 +360,17 @@ void Main::print2(){
         }
 
     }
+}
+
+int Main::setActualItem(Core *Item){
+    this->actualItem = Item;
+    return 0;
+}
+
+void Main::downHierarchie(){
+    ///Aqui va una función que abre una nueva ventna del tipo Main, el cual va a contener todo el circuito interno del modulo (si existe).
+}
+
+void Main::erase(){
+    canvas.removeItem(actualItem);
 }

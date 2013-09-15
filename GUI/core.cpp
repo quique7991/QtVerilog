@@ -3,7 +3,7 @@
 #include <QPainter>
 #include <QMenu>
 
-Core::Core(int left,int top,  QString direccionImagen,QColor color,int cantidadEntradas,int cantidadSalidas,QGraphicsScene *canvas){
+Core::Core(int left,int top,  QString direccionImagen,QColor color,int cantidadEntradas,int cantidadSalidas,Main *parent){
    minHeight = 150;
     if(cantidadEntradas>cantidadSalidas){
         minHeight = cantidadEntradas*10+8;
@@ -20,7 +20,7 @@ Core::Core(int left,int top,  QString direccionImagen,QColor color,int cantidadE
     this->top=top;
     this->direccionImagen=direccionImagen;
     this->color = color;
-    this->canvas=canvas;
+    this->parent=parent;
     this->setFlag(QGraphicsItem::ItemIsMovable);
 }
 
@@ -45,13 +45,14 @@ void Core::paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidge
     painter->drawRect(QRectF(left,top,minWidth,minHeight));
 }
 
-void Core::mousePressEvent(QMouseEvent *event){
+void Core::mousePressEvent(QGraphicsSceneMouseEvent *event){
+    QGraphicsItem::mousePressEvent(event);
     if(event->button()==Qt::RightButton){
-        QMenu* contextMenu = new QMenu ();
+       QMenu* contextMenu = new QMenu ();
         Q_CHECK_PTR ( contextMenu );
-
-        contextMenu->addAction ( "Analyse" , this , SLOT (downHierarchie()) );
-        contextMenu->addAction ( "Erase" , this , SLOT (erase()) );
+        parent->setActualItem(this);
+        contextMenu->addAction ( "Analyse" , parent , SLOT (downHierarchie() ));
+        contextMenu->addAction ( "Erase" , parent , SLOT (erase() ));
         contextMenu->popup( QCursor::pos() );
         contextMenu->exec ();
         delete contextMenu;
@@ -59,19 +60,11 @@ void Core::mousePressEvent(QMouseEvent *event){
     }
 }
 
-void Core::mouseMoveEvent(QMouseEvent *event){
+void Core::mouseMoveEvent(QGraphicsSceneMouseEvent *event){
     QGraphicsItem::mouseMoveEvent(event);
 }
 
-void Core::mouseReleaseEvent(QMouseEvent *event){
+void Core::mouseReleaseEvent(QGraphicsSceneMouseEvent *event){
     QGraphicsItem::mouseReleaseEvent(event);
     update();
-}
-
-void Core::downHierarchie(){
-    qDebug()<<"Down Hierarchie";
-}
-
-void Core::erase(){
-    qDebug()<<"Erase";
 }

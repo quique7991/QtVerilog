@@ -7,31 +7,26 @@
 #include <QtGui>
 #include <QPainter>
 #include <QMenu>
-
-
+#include "canvas.h"
+class Main;
 class Core : public QGraphicsItem
 {
 public:
-    Core(int left,int top, QString direccionImagen,QColor color,int cantidadEntradas,int cantidadSalidas,QGraphicsScene *canvas);
+    Core(int left,int top, QString direccionImagen,QColor color,int cantidadEntradas,int cantidadSalidas,Main *parent);
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget);
 
 protected:
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-
-
-private slots:
-    void downHierarchie();
-    void erase();
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
     int left,top,minWidth,minHeight,z;
     QString direccionImagen;
     QColor color;
-    QGraphicsScene *canvas;
+    Main *parent;
 };
 
 #endif // CORE_H

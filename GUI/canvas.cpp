@@ -294,7 +294,8 @@ void Main::addModulo(){//(int x, int y, QString nombre, int cantidadEntradas, in
 }
 
 void Main::print2(){
-    /*for (int i = 0; i < modulos.size(); ++i) {
+    QList<line*> con;
+    for (int i = 0; i < modulos.size(); ++i) {
         qDebug()<<"Modulo";
         qDebug()<<modulos.at(i)->toPlainText();
         QList<line*> values1 = inputs.values(i);
@@ -302,7 +303,11 @@ void Main::print2(){
             qDebug()<<"Entradas";
             qDebug()<<values1.at(j)->getNombre();
             if(values1.at(j)->getConnected()){
-                qDebug()<<values1.at(j)->getAsociado()->getNombre();
+                qDebug()<<"Conectados a:";
+                con = values1.at(j)->getAsociado();
+                for(int i=0; i<con.size();++i){
+                    qDebug()<<con.at(i)->getNombre();
+                }
             }
             else{
                 qDebug()<<"Sin Conectar";
@@ -313,14 +318,18 @@ void Main::print2(){
             qDebug()<<"Salidas";
             qDebug()<<values.at(j)->getNombre();
             if(values.at(j)->getConnected()){
-                qDebug()<<values.at(j)->getAsociado()->getNombre();
+                qDebug()<<"Conectados a:";
+                con = values.at(j)->getAsociado();
+                for(int i=0; i<con.size();++i){
+                    qDebug()<<con.at(i)->getNombre();
+                }
             }
             else{
                 qDebug()<<"Sin Conectar";
             }
         }
 
-    }*/
+    }
 }
 
 int Main::setActualItem(Core *Item){

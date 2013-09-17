@@ -8,7 +8,8 @@ HEADERS		= canvas.h \
     core.h
 SOURCES		= canvas.cpp main.cpp \
     line.cpp \
-    core.cpp
+    core.cpp \
+    legacy.cpp
 
 RESOURCES += portedcanvas.qrc
 

@@ -248,7 +248,7 @@ void Main::addModulo(){//(int x, int y, QString nombre, int cantidadEntradas, in
     int cantidadSalidas=5;
     int width=150;
     int height=150;
-    QString direccionImagen = "/home/quique/Desktop/portedcanvas/images.jpeg";
+    QString direccionImagen = "/home/quique/Desktop/QtVerilog/GUI/images.jpeg";
     QColor color = Qt::blue;
     int minHeight = 100;
     if(cantidadEntradas>cantidadSalidas){
@@ -266,7 +266,7 @@ void Main::addModulo(){//(int x, int y, QString nombre, int cantidadEntradas, in
         minWidth=height;
     }
     //Objeto central del modulo
-    QGraphicsItem *rectangulo = new Core(x+20,y+14,direccionImagen,color,cantidadEntradas,cantidadSalidas,this,force,width,height);
+    QGraphicsItem *rectangulo = new Core(modulos.size(),x+20,y+14,direccionImagen,color,cantidadEntradas,cantidadSalidas,this,force,width,height);
     rectangulo->setPos(0,0);
     canvas.addItem(rectangulo);
     ///Escribir el nombre, sobre el objeto
@@ -294,7 +294,7 @@ void Main::addModulo(){//(int x, int y, QString nombre, int cantidadEntradas, in
 }
 
 void Main::print2(){
-    for (int i = 0; i < modulos.size(); ++i) {
+    /*for (int i = 0; i < modulos.size(); ++i) {
         qDebug()<<"Modulo";
         qDebug()<<modulos.at(i)->toPlainText();
         QList<line*> values1 = inputs.values(i);
@@ -320,7 +320,7 @@ void Main::print2(){
             }
         }
 
-    }
+    }*/
 }
 
 int Main::setActualItem(Core *Item){
@@ -334,4 +334,20 @@ void Main::downHierarchie(){
 
 void Main::erase(){
     canvas.removeItem(actualItem);
+    QList<line*> out = outputs.values(actualItem->getIndex());
+    QList<line*> con;
+    ///Outputs puede ir a multiples entradas.
+    for(int j=0;j<out.size();++j){
+        con = out.at(j)->getAsociado();
+        for(int i=0;i<con.size();++i){
+            con.at(i)->eraseConnection(out.at(j));
+        }
+    }
+    QList<line*> in = inputs.values(actualItem->getIndex());
+    for(int j=0;j<in.size();++j){
+        QList<line*> con = in.at(j)->getAsociado();
+        for(int i=0;i<con.size();++i){
+            con.at(i)->eraseConnection(in.at(j));
+        }
+    }
 }

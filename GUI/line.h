@@ -14,12 +14,14 @@ public:
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget);
-    int setConnection(line *asociado, QColor color);
-    int setAsociada(line *asociada);
     int setConnected(bool con);
+    int eraseConnection(line *conexion);
+    int addConnection(line *conexion);
+    int setColor(QColor color);
+    QList<line*>& getAsociado();
     QString getNombre();
-    bool getConnected(){return isConnected;}
-    line* getAsociado(){return asociada;}
+    bool getConnected();
+    bool getVarConnected();
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -34,7 +36,7 @@ private:
     int width;
     Main *parent;
     QColor color;
-    line *asociada;
+    QList<line*> asociada;
     QString nombre;
     QList<QPointF> stuff;
     QGraphicsRectItem *rectangle;

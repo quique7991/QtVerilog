@@ -12,10 +12,11 @@ class Main;
 class Core : public QGraphicsItem
 {
 public:
-    Core(int left,int top, QString direccionImagen,QColor color,int cantidadEntradas,int cantidadSalidas,Main *parent,bool force,int width,int height);
+    Core(int index,int left,int top, QString direccionImagen,QColor color,int cantidadEntradas,int cantidadSalidas,Main *parent,bool force,int width,int height);
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget);
+    int getIndex();
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -27,6 +28,7 @@ private:
     QString direccionImagen;
     QColor color;
     Main *parent;
+    int index;
 };
 
 #endif // CORE_H

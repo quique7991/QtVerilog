@@ -3,7 +3,7 @@
 #include <QPainter>
 #include <QMenu>
 
-Core::Core(int left,int top,  QString direccionImagen,QColor color,int cantidadEntradas,int cantidadSalidas,Main *parent,bool force,int width,int height){
+Core::Core(int index, int left,int top,  QString direccionImagen,QColor color,int cantidadEntradas,int cantidadSalidas,Main *parent,bool force,int width,int height){
    minHeight = 150;
     if(cantidadEntradas>cantidadSalidas){
         minHeight = cantidadEntradas*10+8;
@@ -25,7 +25,12 @@ Core::Core(int left,int top,  QString direccionImagen,QColor color,int cantidadE
     this->direccionImagen=direccionImagen;
     this->color = color;
     this->parent=parent;
+    this->index=index;
     this->setFlag(QGraphicsItem::ItemIsMovable);
+}
+
+int Core::getIndex(){
+    return this->index;
 }
 
 QRectF Core::boundingRect() const{

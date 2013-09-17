@@ -22,39 +22,6 @@
 #include "line.h"
 #include "core.h"
 
-class ImageItem: public QGraphicsRectItem
-{
-public:
-    ImageItem( QImage img );
-protected:
-    void paint( QPainter *, const QStyleOptionGraphicsItem *option, QWidget *widget );
-private:
-    QImage image;
-    QPixmap pixmap;
-};
-
-
-ImageItem::ImageItem( QImage img )
-    : image(img)
-{
-    setRect(0, 0, image.width(), image.height());
-    setFlag(ItemIsMovable);
-#if !defined(Q_WS_QWS)
-    pixmap.fromImage(image, Qt::OrderedAlphaDither);
-#endif
-}
-
-void ImageItem::paint( QPainter *p, const QStyleOptionGraphicsItem *option, QWidget * )
-{
-// On Qt/Embedded, we can paint a QImage as fast as a QPixmap,
-// but on other platforms, we need to use a QPixmap.
-#if defined(Q_WS_QWS)
-    p->drawImage( option->exposedRect, image, option->exposedRect, Qt::OrderedAlphaDither );
-#else
-    p->drawPixmap( option->exposedRect, pixmap, option->exposedRect );
-#endif
-}
-
 FigureEditor::FigureEditor(
 	QGraphicsScene& c, QWidget* parent,
 	const char* name, Qt::WindowFlags f) :
@@ -310,12 +277,6 @@ void Main::addModulo(){//(int x, int y, QString nombre, int cantidadEntradas, in
     modulos<<text;
     int posicion = modulos.lastIndexOf(text);
     ///Shadows
-/*  QGraphicsLineItem *line1 =  QString nombrecanvas.addLine(QLineF(20,minHeight+14,20+minWidth,minHeight+14) );
-    QGraphicsLineItem *line2 = canvas.addLine(QLineF(20+minWidth,14+minHeight,20+minWidth,20) );
-    line1->setPen(QPen(Qt::gray, 1));
-    line2->setPen(QPen(Qt::black, 0));
-    line1->setParentItem(rectangulo);
-    line2->setParentItem(rectangulo);*/
     for(int i = 0; i<cantidadEntradas;++i){
         line *lineInput = new line(this,Qt::black,x,x+20-1,y+18+i*((minHeight-10)/(cantidadEntradas-1)),true,0,&canvas,"bla"+QString::number(i)+"in");
         lineInput->setPos(QPointF(0, 0));

@@ -12,6 +12,7 @@
 #include <QGraphicsItem>
 #include "line.h"
 #include "core.h"
+class Parser;
 class line;
 class Core;
 class Sprite : public QGraphicsPixmapItem{
@@ -64,7 +65,6 @@ private slots:
     void newView();
     void clear();
     void init();
-    void addModulo();//(int x, int y, QString nombre, int cantidadEntradas, int cantidadSalidas, QString direccionImagen, QColor color, QString *in, QString *out);
     void addSpriteMine();
     void enlarge();
     void shrink();
@@ -77,14 +77,18 @@ private slots:
     void moveR();
     void moveU();
     void moveD();
-
     void print();
+    void DropModuleFromDB();
+    void DropModuleFromFile();
+    void ProcessModules();
 
 private:
     QGraphicsScene& canvas;
     FigureEditor *editor;
     Core *actualItem;
     QMenu* options;
+    void AddModulesToDB(Parser &);
+    void addModulo(QString , int , int , QVector<QString> &in, QVector<QString> &out);//(int x, int y, QString nombre, int cantidadEntradas, int cantidadSalidas, QString direccionImagen, QColor color, QString *in, QString *out);
 #if !defined(Q_OS_SYMBIAN)
     QPrinter* printer;
 #endif

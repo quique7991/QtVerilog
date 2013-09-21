@@ -17,11 +17,15 @@
 #include <QDebug>
 #include <QGraphicsItemGroup>
 #include <QGraphicsTextItem>
-
+#include <QFileDialog>
+#include <QtSql>
+#include <iostream>
 #include "canvas.h"
 #include "line.h"
 #include "core.h"
-
+#include "parser.h"
+#include "fromfile.h"
+#include "addfromdb.h"
 FigureEditor::FigureEditor(
 	QGraphicsScene& c, QWidget* parent,
 	const char* name, Qt::WindowFlags f) :
@@ -83,7 +87,10 @@ Main::Main(QGraphicsScene& c, QWidget* parent, Qt::WindowFlags f) :
 
     QMenu* edit = new QMenu("&Edit", menu );
     edit->addAction("Add &Sprite",this,SLOT(addSpriteMine()),Qt::ALT+Qt::Key_B);
-    edit->addAction("Add Modulo",this,SLOT(addModulo()/*(0,0,"Modulo",3,3,"BLA",Qt::blue,bla1,bla2)*/),Qt::ALT+Qt::Key_1);
+    edit->addAction("Add Modules",this,SLOT(ProcessModules()/*(0,0,"Modulo",3,3,"BLA",Qt::blue,bla1,bla2)*/),Qt::ALT+Qt::Key_1);
+    QMenu *DropModule = edit->addMenu("Drop Module");
+    DropModule->addAction("From &Database", this, SLOT(DropModuleFromDB()));
+    DropModule->addAction("From &File", this, SLOT(DropModuleFromFile()));
     edit->addAction("Imprimir Conexiones",this,SLOT(print2()),Qt::ALT+Qt::Key_A);
     menu->addMenu(edit);
     QMenu* view = new QMenu("&View", menu );
@@ -107,9 +114,20 @@ Main::Main(QGraphicsScene& c, QWidget* parent, Qt::WindowFlags f) :
     help->addAction("&About", this, SLOT(help()), Qt::Key_F1);
     menu->addMenu(help);
 
+    QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+    db.setHostName("localhost");
+    db.setDatabaseName("Prueba");
+    db.setUserName("prueba");
+    db.setPassword("KarenPa0la");
+    if(!db.open()){
+        QMessageBox::critical(this, tr("DB Error"),tr("Could not login to db"),QMessageBox::Ok);
+    }
+
     statusBar();
 
     setCentralWidget(editor);
+
+    QSqlQuery Query("create table IF NOT EXISTS Modules(id int unsigned not null auto_increment, Name varchar(30) not null, Inputs int not null, Outputs int not null, ImageFile varchar(30), PortInfoFile varchar(30), primary key(id))");
 
 #if !defined(Q_OS_SYMBIAN)
     printer = 0;
@@ -238,17 +256,95 @@ void Main::addSpriteMine()
 QList<QGraphicsItem*> modulos;
 QMultiHash<int,line*> conexiones;
 
+void Main::ProcessModules(){
+    QString filename = QFileDialog::getOpenFileName();
+    Parser pars(filename);
+    AddModulesToDB(pars);
+    QMessageBox::information(this, tr("Info"),tr("The modules were added to the database\n"),QMessageBox::Ok);
 
-void Main::addModulo(){//(int x, int y, QString nombre, int cantidadEntradas, int cantidadSalidas, QString direccionImagen, QColor color, QString *in, QString *out,bool force,int width,int height){
+
+}
+
+void Main::AddModulesToDB(Parser &pars){
+    QString Query = "";
+    for(int i = 0; i<pars.ModulesIF.size(); ++i){
+        QString ModName = pars.ModulesIF[i].Name;
+        std::cout<<"Module:"<<ModName.toStdString()<<std::endl;
+        Query.append(QString("INSERT INTO Modules (Name, Inputs, Outputs) VALUES ('%1','%2','%3')").arg(ModName).arg(pars.ModulesIF[i].InputsTotal).arg(pars.ModulesIF[i].OutputsTotal));
+        std::cout<<Query.toStdString()<<std::endl;
+        QSqlQuery QuerySql(Query);
+        Query.clear();
+    }
+}
+
+void Main::DropModuleFromDB(){
+    AddFromDB Dialog(this);
+    if(Dialog.exec() == QDialog::Accepted){
+        QString QueryTemp("SELECT * from Modules WHERE id=");
+        QueryTemp += QString::number(Dialog.Location4+1);
+        std::cout<<QueryTemp.toStdString()<<std::endl;
+        std::cout << Dialog.Location4 << std::endl ;
+        QSqlQuery Query(QueryTemp);
+        QVector<QString> inputs, outputs;
+        while(Query.next()){
+        for(int i = 0 ; i<Query.value(2).toInt(); ++i){
+            inputs << QString("IN")+QString::number(i+1);
+        }
+        for(int i = 0; i<Query.value(3).toInt(); ++i)
+            outputs << QString("OUT")+QString::number(i+1);
+
+        addModulo(Query.value(1).toString(), Query.value(2).toInt(), Query.value(3).toInt(), inputs, outputs);
+        }
+    }
+}
+
+void Main::DropModuleFromFile(){
+    QString filename = QFileDialog::getOpenFileName();
+    Parser pars(filename);
+    FromFile Dialog(this,&pars);
+    int row;
+    if(Dialog.exec() == QDialog::Accepted){
+        row = Dialog.Location;
+        QVector<QString> inputs(pars.ModulesIF[row].InputsTotal);
+        QVector<QString> outputs(pars.ModulesIF[row].OutputsTotal);
+        QString Temp;
+        int temp = 0;
+        for(int i = 0; i<pars.ModulesIF[row].Inputs.size(); ++i){
+            for(int j = 0; j < pars.ModulesIF[row].Inputs[i].BusWidth; ++j){
+                Temp = pars.ModulesIF[row].Inputs[i].Name+QString::number(j);
+                inputs[temp] = Temp;
+                Temp.clear();
+                temp += 1;
+            }
+        }
+
+        temp = 0;
+        for(int i = 0; i<pars.ModulesIF[row].Outputs.size(); ++i){
+            for(int j = 0; j < pars.ModulesIF[row].Outputs[i].BusWidth; ++j){
+                Temp = pars.ModulesIF[row].Outputs[i].Name+QString::number(j);
+                outputs[temp] += Temp;
+                Temp.clear();
+                temp += 1;
+            }
+        }
+        QString name_arg = pars.ModulesIF[row].Name;
+        int InputsQuant = pars.ModulesIF[row].InputsTotal;
+        int OutputsQuant = pars.ModulesIF[row].OutputsTotal;
+        addModulo(name_arg, InputsQuant, OutputsQuant, inputs, outputs);
+    }
+
+}
+
+void Main::addModulo(QString nombre_arg, int cantidadEntradas_Arg, int cantidadSalidas_Arg, QVector<QString> &in, QVector<QString> &out){//(int x, int y, QString nombre, int cantidadEntradas, int cantidadSalidas, QString direccionImagen, QColor color, QString *in, QString *out,bool force,int width,int height){
     int x=0;
     int y=0;
-    QString nombre="Modulo";
     bool force= false;
-    int cantidadEntradas=5;
-    int cantidadSalidas=5;
+    QString nombre =nombre_arg;
+    int cantidadEntradas = cantidadEntradas_Arg;
+    int cantidadSalidas = cantidadSalidas_Arg;
     int width=150;
     int height=150;
-    QString direccionImagen = "/home/quique/Desktop/QtVerilog/GUI/images.jpeg";
+    QString direccionImagen = "/home/quique/Desktop/Primer entrega/QtVerilog/GUI/images.jpeg";
     QColor color = Qt::blue;
     int minHeight = 100;
     if(cantidadEntradas>cantidadSalidas){
@@ -278,14 +374,22 @@ void Main::addModulo(){//(int x, int y, QString nombre, int cantidadEntradas, in
     int posicion = modulos.lastIndexOf(text);
     ///Shadows
     for(int i = 0; i<cantidadEntradas;++i){
-        line *lineInput = new line(this,Qt::black,x,x+20-1,y+18+i*((minHeight-10)/(cantidadEntradas-1)),true,0,&canvas,"bla"+QString::number(i)+"in");
+        line *lineInput;
+        if(cantidadEntradas !=1 )
+            lineInput = new line(this,Qt::black,x,x+20-1,y+18+i*((minHeight-10)/(cantidadEntradas-1)),true,0,&canvas,in[i]);
+        else
+            lineInput = new line(this,Qt::black,x,x+20-1,y+18+((minHeight-10)/2),true,0,&canvas,in[i]);
         lineInput->setPos(QPointF(0, 0));
         canvas.addItem(lineInput);
         lineInput->setParentItem(rectangulo);
         inputs.insert(posicion,lineInput);
     }
     for(int i = 0; i<cantidadSalidas;++i){
-        line *lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)/(cantidadSalidas-1)),false,0,&canvas,"bla"+QString::number(i)+"out");
+         line *lineOutput;
+        if(cantidadSalidas !=1)
+            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)/(cantidadSalidas-1)),false,0,&canvas,out[i]);
+        else
+            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+((minHeight-10)/2),false,0,&canvas,out[i]);//lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)*2),false,0,&canvas,out[i]);
         lineOutput->setPos(QPointF(0, 0));
         canvas.addItem(lineOutput);
         lineOutput->setParentItem(rectangulo);

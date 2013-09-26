@@ -344,7 +344,7 @@ void Main::addModulo(QString nombre_arg, int cantidadEntradas_Arg, int cantidadS
     int cantidadSalidas = cantidadSalidas_Arg;
     int width=150;
     int height=150;
-    QString direccionImagen = "/home/quique/Desktop/Primer entrega/QtVerilog/GUI/images.jpeg";
+    QString direccionImagen = "/home/quique/Desktop/QtVerilog/GUI/images.jpeg";
     QColor color = Qt::blue;
     int minHeight = 100;
     if(cantidadEntradas>cantidadSalidas){
@@ -376,9 +376,9 @@ void Main::addModulo(QString nombre_arg, int cantidadEntradas_Arg, int cantidadS
     for(int i = 0; i<cantidadEntradas;++i){
         line *lineInput;
         if(cantidadEntradas !=1 )
-            lineInput = new line(this,Qt::black,x,x+20-1,y+18+i*((minHeight-10)/(cantidadEntradas-1)),true,0,&canvas,in[i]);
+            lineInput = new line(this,Qt::black,x,x+20-1,y+18+i*((minHeight-10)/(cantidadEntradas-1)),true,0,&canvas,in[i],2);
         else
-            lineInput = new line(this,Qt::black,x,x+20-1,y+18+((minHeight-10)/2),true,0,&canvas,in[i]);
+            lineInput = new line(this,Qt::black,x,x+20-1,y+18+((minHeight-10)/2),true,0,&canvas,in[i],2);
         lineInput->setPos(QPointF(0, 0));
         canvas.addItem(lineInput);
         lineInput->setParentItem(rectangulo);
@@ -387,9 +387,9 @@ void Main::addModulo(QString nombre_arg, int cantidadEntradas_Arg, int cantidadS
     for(int i = 0; i<cantidadSalidas;++i){
          line *lineOutput;
         if(cantidadSalidas !=1)
-            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)/(cantidadSalidas-1)),false,0,&canvas,out[i]);
+            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)/(cantidadSalidas-1)),false,0,&canvas,out[i],2);
         else
-            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+((minHeight-10)/2),false,0,&canvas,out[i]);//lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)*2),false,0,&canvas,out[i]);
+            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+((minHeight-10)/2),false,0,&canvas,out[i],2);//lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)*2),false,0,&canvas,out[i]);
         lineOutput->setPos(QPointF(0, 0));
         canvas.addItem(lineOutput);
         lineOutput->setParentItem(rectangulo);
@@ -408,13 +408,22 @@ void Main::print2(){
             qDebug()<<values1.at(j)->getNombre();
             if(values1.at(j)->getConnected()){
                 qDebug()<<"Conectados a:";
-                con = values1.at(j)->getAsociado();
-                for(int i=0; i<con.size();++i){
-                    qDebug()<<con.at(i)->getNombre();
+                for(int i=0;i<values1.at(j)->getCantidadBits();++i){
+                    qDebug()<<"Bit "+QString::number(i);
+                    if(values1.at(j)->getConnected(i)){
+                        con = values1.at(j)->getAsociado(i);
+                        for(int z=0; z<con.size();++z){
+                            qDebug()<<con.at(z)->getNombre();
+                        }
+
+                    }
+                    else{
+                        qDebug()<<"No Conectado";
+                    }
                 }
             }
             else{
-                qDebug()<<"Sin Conectar";
+                qDebug()<<"Sin Conexión";
             }
         }
         QList<line*> values = outputs.values(i);
@@ -423,13 +432,22 @@ void Main::print2(){
             qDebug()<<values.at(j)->getNombre();
             if(values.at(j)->getConnected()){
                 qDebug()<<"Conectados a:";
-                con = values.at(j)->getAsociado();
-                for(int i=0; i<con.size();++i){
-                    qDebug()<<con.at(i)->getNombre();
+                for(int i=0;i<values1.at(j)->getCantidadBits();++i){
+                    qDebug()<<"Bit "+QString::number(i);
+                    if(values1.at(j)->getConnected(i)){
+                        con = values1.at(j)->getAsociado(i);
+                        for(int z=0; z<con.size();++z){
+                            qDebug()<<con.at(z)->getNombre();
+                        }
+
+                    }
+                    else{
+                        qDebug()<<"No Conectado";
+                    }
                 }
             }
             else{
-                qDebug()<<"Sin Conectar";
+                qDebug()<<"Sin Conexión";
             }
         }
 
@@ -451,16 +469,22 @@ void Main::erase(){
     QList<line*> con;
     ///Outputs puede ir a multiples entradas.
     for(int j=0;j<out.size();++j){
-        con = out.at(j)->getAsociado();
-        for(int i=0;i<con.size();++i){
-            con.at(i)->eraseConnection(out.at(j));
+        for(int z=0;z<out.at(j)->getCantidadBits();++z){
+            con = out.at(j)->getAsociado(z);
+            for(int i=0;i<con.size();++i){
+                con.at(i)->eraseConnection(out.at(j),z);
+            }
+
         }
     }
     QList<line*> in = inputs.values(actualItem->getIndex());
     for(int j=0;j<in.size();++j){
-        QList<line*> con = in.at(j)->getAsociado();
-        for(int i=0;i<con.size();++i){
-            con.at(i)->eraseConnection(in.at(j));
+        for(int z=0;z<out.at(j)->getCantidadBits();++z){
+            con = out.at(j)->getAsociado(z);
+            for(int i=0;i<con.size();++i){
+                con.at(i)->eraseConnection(out.at(j),z);
+            }
+
         }
     }
 }

@@ -15,9 +15,9 @@ public:
     Module(){}
     QVector<Port> Inputs;
     QVector<Port> Outputs;
+    QString Name;
     int InputsTotal;
     int OutputsTotal;
-    QString Name;
 };
 
 #endif // MODULE_H

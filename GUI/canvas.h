@@ -47,6 +47,8 @@ public:
     int setActualItem(Core *Item);
     line *ultimo;
     bool isValid;
+    bool isBus;
+    int bitNumber;
     bool isSecondClick;
     bool isInput;
     QColor color;

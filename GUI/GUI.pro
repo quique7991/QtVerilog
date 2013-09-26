@@ -10,12 +10,15 @@ QT       += core gui sql
 # Input
 HEADERS += canvas.h core.h line.h module.h parser.h port.h \
     fromfile.h \
-    addfromdb.h
-SOURCES += canvas.cpp core.cpp legacy.cpp line.cpp main.cpp parser.cpp \
+    addfromdb.h \
+    busconnection.h
+SOURCES += canvas.cpp core.cpp line.cpp main.cpp parser.cpp \
     fromfile.cpp \
-    addfromdb.cpp
+    addfromdb.cpp \
+    busconnection.cpp
 RESOURCES += portedcanvas.qrc
 
 FORMS += \
     fromfile.ui \
-    addfromdb.ui
+    addfromdb.ui \
+    busconnection.ui

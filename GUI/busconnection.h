@@ -2,6 +2,7 @@
 #define BUSCONNECTION_H
 
 #include <QTabWidget>
+#include <QList>
 #include "line.h"
 #include "canvas.h"
 
@@ -21,6 +22,8 @@ public:
     ~busConnection();
     
 private slots:
+
+    void on_pushButton_3_clicked();
 
 private:
     Ui::busConnection *ui;

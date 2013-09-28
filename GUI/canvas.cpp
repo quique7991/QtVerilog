@@ -376,9 +376,9 @@ void Main::addModulo(QString nombre_arg, int cantidadEntradas_Arg, int cantidadS
     for(int i = 0; i<cantidadEntradas;++i){
         line *lineInput;
         if(cantidadEntradas !=1 )
-            lineInput = new line(this,Qt::black,x,x+20-1,y+18+i*((minHeight-10)/(cantidadEntradas-1)),true,0,&canvas,in[i],1);
+            lineInput = new line(this,Qt::black,x,x+20-1,y+18+i*((minHeight-10)/(cantidadEntradas-1)),true,0,&canvas,in[i],2);
         else
-            lineInput = new line(this,Qt::black,x,x+20-1,y+18+((minHeight-10)/2),true,0,&canvas,in[i],1);
+            lineInput = new line(this,Qt::black,x,x+20-1,y+18+((minHeight-10)/2),true,0,&canvas,in[i],2);
         lineInput->setPos(QPointF(0, 0));
         canvas.addItem(lineInput);
         lineInput->setParentItem(rectangulo);

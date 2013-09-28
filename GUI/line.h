@@ -26,6 +26,7 @@ public:
     bool getConnected(int key);///Devuelve si algun nodo conectado.
     bool getVarConnected();///devuelve si la variable esta asociada un conectado.
     int getCantidadBits(){return cantidadBits;}
+    QColor getColor(){return color;}
 
 protected:
     ///Eventos de mouse

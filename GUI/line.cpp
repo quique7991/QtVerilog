@@ -80,8 +80,13 @@ int line::eraseConnection(line *conexion, int key, int from){
 */
 int line::addConnection(line *conexion, int to,int from){
     connection prueba(conexion,from);
+    QList<connection> container;
     if(isInput){///Si es una entrada solo puede existir una conexion.
         if(asociada.contains(to)){
+            container = asociada.values(to);
+            for(int i=0;i<container.size();++i){
+                container.at(i).conexion->eraseConnection(this,container.at(i).bit,to);
+            }
             asociada.replace(to,prueba);
         }
         else{

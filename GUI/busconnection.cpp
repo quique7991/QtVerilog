@@ -96,7 +96,7 @@ void busConnection::on_pushButton_3_clicked()
             if((QSpinBoxBlockInLeft.at(i)->value() <= QSpinBoxBlockInRight.at(i)->value())&&(QSpinBoxBlockOutLeft.at(i)->value()<=QSpinBoxBlockOutRight.at(i)->value())){
                 for(int j=QSpinBoxBlockInLeft.at(i)->value();j<=QSpinBoxBlockInRight.at(i)->value();++j){
                     if(in[j]){
-                    ///Se abre una ventana de warning
+                    ///Se abre una ventana de warning en caso de que un bit se repita
                         QMessageBox msgBox;
                         msgBox.setIcon(QMessageBox::Warning);
                         msgBox.setText("El bit "+QString::number(j)+" de la columna de la izquierda se repite en varias lineas");
@@ -124,7 +124,7 @@ void busConnection::on_pushButton_3_clicked()
                         in[j]=true;
                     }
                 }
-                for(int j=QSpinBoxBlockOutLeft.at(i)->value();j<=QSpinBoxBlockOutRight.at(i)->value();++j){
+                for(int j=QSpinBoxBlockOutLeft.at(i)->value();j<=QSpinBoxBlockOutRight.at(i)->value();++j){///Se hacen warning en caso de que un bit salga conectado varias veces.
                     if(out[j]){
                         //Se abre una ventana de warning
                         QMessageBox msgBox;
@@ -154,7 +154,7 @@ void busConnection::on_pushButton_3_clicked()
                     }
                 }
             }
-            else{
+            else{///Se abre un error cuando la cantidad de bits de una columna no coordinan con la otra.
                 QMessageBox msgBox;
                 msgBox.setIcon(QMessageBox::Critical);
                 msgBox.setText("Los rangos en la linea "+QString::number(i)+" tienen un error.");
@@ -184,8 +184,8 @@ void busConnection::on_pushButton_3_clicked()
                 }
                 int diff=derechaIn-izquierdaIn;
                 for(int i=0;i<=diff;++i){
-                    ventana->ultimo->addConnection(last,izquierdaOut+i,izquierdaIn+i);
-                    last->addConnection(ventana->ultimo,izquierdaIn+i,izquierdaOut+i);
+                    ventana->ultimo->addConnection(last,izquierdaIn+i,izquierdaOut+i);
+                    last->addConnection(ventana->ultimo,izquierdaOut+i,izquierdaIn+i);
                 }
             }
         }
@@ -215,13 +215,13 @@ void busConnection::on_pushButton_clicked()
 {
     if(ventana->ultimo->getCantidadBits()==1){
         ventana->ultimo->setColor(last->getColor());
-        ventana->ultimo->addConnection(last,ui->spinBox_7->value(),0);
-        last->addConnection(ventana->ultimo,0,ui->spinBox_7->value());
+        ventana->ultimo->addConnection(last,0,ui->spinBox_7->value());
+        last->addConnection(ventana->ultimo,ui->spinBox_7->value(),0);
     }
     else{
         last->setColor(ventana->ultimo->getColor());
-        ventana->ultimo->addConnection(last,0,ui->spinBox_7->value());
-        last->addConnection(ventana->ultimo,ui->spinBox_7->value(),0);
+        ventana->ultimo->addConnection(last,ui->spinBox_7->value(),0);
+        last->addConnection(ventana->ultimo,0,ui->spinBox_7->value());
     }
     this->close();
     ventana->ultimo=0;
@@ -238,7 +238,7 @@ void busConnection::on_spinBox_5_valueChanged(int arg1)
         QCheckBox *intento = new QCheckBox;
         intento->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
         QSpinBox *left = new QSpinBox(0);
-        left->setMaximum(last->getCantidadBits()-1);
+        left->setMaximum(ventana->ultimo->getCantidadBits()-1);
         QSpinBox *right = new QSpinBox(0);
         right->setMaximum(last->getCantidadBits()-1);
         checkboxOneOne.append(intento);
@@ -263,13 +263,14 @@ void busConnection::newOneOneLine(int bla){
     else{
         index = QSpinBoxOneOneRight.indexOf((QSpinBox*) this->sender());
     }
-    if((!checkboxOneOne.at(index)->isChecked())&&(oneOneCounter<(last->getCantidadBits()))){
+    int min = (last->getCantidadBits() > ventana->ultimo->getCantidadBits())?(ventana->ultimo->getCantidadBits()):(last->getCantidadBits());
+    if((!checkboxOneOne.at(index)->isChecked())&&(oneOneCounter<min)){
         QHBoxLayout *bla = new QHBoxLayout;
         ui->verticalLayout->addLayout(bla);
         QCheckBox *intento = new QCheckBox;
         intento->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
         QSpinBox *left = new QSpinBox(0);
-        left->setMaximum(last->getCantidadBits()-1);
+        left->setMaximum(ventana->ultimo->getCantidadBits()-1);
         QSpinBox *right = new QSpinBox(0);
         right->setMaximum(last->getCantidadBits()-1);
         checkboxOneOne.append(intento);
@@ -294,7 +295,7 @@ void busConnection::on_spinBox_6_valueChanged(int arg1)
         QCheckBox *intento = new QCheckBox;
         intento->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
         QSpinBox *left = new QSpinBox(0);
-        left->setMaximum(last->getCantidadBits()-1);
+        left->setMaximum(ventana->ultimo->getCantidadBits()-1);
         QSpinBox *right = new QSpinBox(0);
         right->setMaximum(last->getCantidadBits()-1);
         checkboxOneOne.append(intento);
@@ -322,8 +323,8 @@ void busConnection::on_pushButton_2_clicked()
             else{
                 last->setColor(ventana->ultimo->getColor());
             }
-            ventana->ultimo->addConnection(last,QSpinBoxOneOneRight.at(i)->value(),QSpinBoxOneOneLeft.at(i)->value());
-            last->addConnection(ventana->ultimo,QSpinBoxOneOneLeft.at(i)->value(),QSpinBoxOneOneLeft.at(i)->value());
+            last->addConnection(ventana->ultimo,QSpinBoxOneOneRight.at(i)->value(),QSpinBoxOneOneLeft.at(i)->value());
+            ventana->ultimo->addConnection(last,QSpinBoxOneOneLeft.at(i)->value(),QSpinBoxOneOneRight.at(i)->value());
         }
     }
     this->close();
@@ -377,4 +378,20 @@ void busConnection::newBlockLine(int k){
         bla->addWidget(rightOut);
     }
     checkBoxBlock.at(index)->setChecked(true);
+}
+
+void busConnection::closeEvent(QCloseEvent *event){
+    Q_UNUSED(event);
+    if(!(ventana->ultimo->getTrulyConnected())){
+        if(ventana->ultimo->getCantidadBits()>1){
+            ventana->ultimo->setPaintTemp(false);
+        }else{
+            ventana->ultimo->setConnected(false,0);
+        }
+    }
+    else{
+        if(ventana->ultimo->getCantidadBits()>1){
+            ventana->ultimo->setPaintTemp(false);
+        }
+    }
 }

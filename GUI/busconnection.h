@@ -42,6 +42,7 @@ private slots:
     void on_pushButton_2_clicked();
 
 private:
+    void closeEvent(QCloseEvent *);
     Ui::busConnection *ui;
     line *last;
     Main* ventana;

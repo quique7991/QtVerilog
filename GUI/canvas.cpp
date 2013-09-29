@@ -400,60 +400,61 @@ void Main::addModulo(QString nombre_arg, int cantidadEntradas_Arg, int cantidadS
 void Main::print2(){
     QList<connection> con;
     for (int i = 0; i < modulos.size(); ++i) {
-        qDebug()<<"Modulo";
-        qDebug()<<modulos.at(i)->toPlainText();
-        QList<line*> values1 = inputs.values(i);
-        for(int j=0;j<values1.size();++j){
-            qDebug()<<"Entradas";
-            qDebug()<<values1.at(j)->getNombre();
-            if(values1.at(j)->getConnected()){
-                //qDebug()<<"Conectados a:";
-                for(int i=0;i<values1.at(j)->getCantidadBits();++i){
-                    qDebug()<<"-Bit "+QString::number(i);
-                    qDebug()<<"     Conectados a:";
-                    if(values1.at(j)->getConnected(i)){
-                        con = values1.at(j)->getAsociado(i);
-                        for(int z=0; z<con.size();++z){
-                            qDebug()<<"     *"+con.at(z).conexion->getNombre();
-                            qDebug()<<"         @"+QString::number(con.at(z).bit);
-                        }
+        if(modulos.at(i)!=0){///Un cero en la lista significa que fue borrado.
+            qDebug()<<"Modulo";
+            qDebug()<<modulos.at(i)->toPlainText();
+            QList<line*> values1 = inputs.values(i);
+            for(int j=0;j<values1.size();++j){
+                qDebug()<<"Entradas";
+                qDebug()<<values1.at(j)->getNombre();
+                if(values1.at(j)->getConnected()){
+                    //qDebug()<<"Conectados a:";
+                    for(int i=0;i<values1.at(j)->getCantidadBits();++i){
+                        qDebug()<<"-Bit "+QString::number(i);
+                        qDebug()<<"     Conectados a:";
+                        if(values1.at(j)->getConnected(i)){
+                            con = values1.at(j)->getAsociado(i);
+                            for(int z=0; z<con.size();++z){
+                                qDebug()<<"     *"+con.at(z).conexion->getNombre();
+                                qDebug()<<"         @"+QString::number(con.at(z).bit);
+                            }
 
-                    }
-                    else{
-                        qDebug()<<"     *No Conectado";
-                    }
-                }
-            }
-            else{
-                qDebug()<<"Sin Conexión";
-            }
-        }
-        QList<line*> values = outputs.values(i);
-        for(int j=0;j<values.size();++j){
-            qDebug()<<"Salidas";
-            qDebug()<<values.at(j)->getNombre();
-            if(values.at(j)->getConnected()){
-                //qDebug()<<"Conectados a:";
-                for(int i=0;i<values.at(j)->getCantidadBits();++i){
-                    qDebug()<<"-Bit "+QString::number(i);
-                    qDebug()<<"     Conectados a:";
-                    if(values.at(j)->getConnected(i)){
-                        con = values.at(j)->getAsociado(i);
-                        for(int z=0; z<con.size();++z){
-                            qDebug()<<"     *"+con.at(z).conexion->getNombre();
-                            qDebug()<<"         @"+QString::number(con.at(z).bit);
+                        }
+                        else{
+                            qDebug()<<"     *No Conectado";
                         }
                     }
-                    else{
-                        qDebug()<<"     *No Conectado";
-                    }
+                }
+                else{
+                    qDebug()<<"Sin Conexión";
                 }
             }
-            else{
-                qDebug()<<"Sin Conexión";
+            QList<line*> values = outputs.values(i);
+            for(int j=0;j<values.size();++j){
+                qDebug()<<"Salidas";
+                qDebug()<<values.at(j)->getNombre();
+                if(values.at(j)->getConnected()){
+                    //qDebug()<<"Conectados a:";
+                    for(int i=0;i<values.at(j)->getCantidadBits();++i){
+                        qDebug()<<"-Bit "+QString::number(i);
+                        qDebug()<<"     Conectados a:";
+                        if(values.at(j)->getConnected(i)){
+                            con = values.at(j)->getAsociado(i);
+                            for(int z=0; z<con.size();++z){
+                                qDebug()<<"     *"+con.at(z).conexion->getNombre();
+                                qDebug()<<"         @"+QString::number(con.at(z).bit);
+                            }
+                        }
+                        else{
+                            qDebug()<<"     *No Conectado";
+                        }
+                    }
+                }
+                else{
+                    qDebug()<<"Sin Conexión";
+                }
             }
         }
-
     }
 }
 
@@ -468,6 +469,10 @@ void Main::downHierarchie(){
 
 void Main::erase(){
     canvas.removeItem(actualItem);
+    int index = actualItem->getIndex();
+    modulos.replace(index,0);
+    inputs.remove(index);
+    outputs.remove(index);
     QList<line*> out = outputs.values(actualItem->getIndex());
     QList<connection> con;
     ///Outputs puede ir a multiples entradas.
@@ -482,8 +487,8 @@ void Main::erase(){
     }
     QList<line*> in = inputs.values(actualItem->getIndex());
     for(int j=0;j<in.size();++j){
-        for(int z=0;z<out.at(j)->getCantidadBits();++z){
-            con = out.at(j)->getAsociado(z);
+        for(int z=0;z<in.at(j)->getCantidadBits();++z){
+            con = in.at(j)->getAsociado(z);
             for(int i=0;i<con.size();++i){
                 con.at(i).conexion->eraseConnection(out.at(j),z,con.at(i).bit);
             }

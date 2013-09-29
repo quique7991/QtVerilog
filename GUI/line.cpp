@@ -248,7 +248,7 @@ void line::mousePressEvent(QGraphicsSceneMouseEvent *event)
                             else{///Equivalente a un click sencillo.
                                 QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
                                 for(int i=0;i<borrar.size();++i){
-                                    borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
+                                    borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
                                 }
                                 this->asociada.remove(0);///Se limpia la lista de conexiones.
                                 ///>Se almacenan las variables para indicar que el siguiente click es el segundo click del botón.
@@ -268,7 +268,7 @@ void line::mousePressEvent(QGraphicsSceneMouseEvent *event)
                         else{///Click Sencillo
                             QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
                             for(int i=0;i<borrar.size();++i){
-                                borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
+                                borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
                             }
                             this->asociada.remove(0);///Se limpia la lista de conexiones.
                             ///>Se almacenan las variables y se asignan los colores al presente.
@@ -293,7 +293,7 @@ void line::mousePressEvent(QGraphicsSceneMouseEvent *event)
                                 if(isInput){//Si es entrada
                                     QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
                                     for(int i=0;i<borrar.size();++i){
-                                        borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
+                                        borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
                                     }
                                     this->asociada.remove(0);///Se limpia la lista de conexiones.
                                     ///>Se conectan los dos nodos (this y el que ya se encontraba almacenado en el parent.
@@ -440,7 +440,7 @@ void line::mousePressEvent(QGraphicsSceneMouseEvent *event)
             else{///Click Sencillo
                 QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
                 for(int i=0;i<borrar.size();++i){
-                    borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
+                    borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
                 }
                 this->asociada.remove(0);///Se limpia la lista de conexiones.
                 ///>Se asignan los valores del cuadrado y de conexión tanto al padre como a *this.

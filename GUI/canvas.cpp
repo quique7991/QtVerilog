@@ -470,9 +470,6 @@ void Main::downHierarchie(){
 void Main::erase(){
     canvas.removeItem(actualItem);
     int index = actualItem->getIndex();
-    modulos.replace(index,0);
-    inputs.remove(index);
-    outputs.remove(index);
     QList<line*> out = outputs.values(actualItem->getIndex());
     QList<connection> con;
     ///Outputs puede ir a multiples entradas.
@@ -480,7 +477,7 @@ void Main::erase(){
         for(int z=0;z<out.at(j)->getCantidadBits();++z){
             con = out.at(j)->getAsociado(z);
             for(int i=0;i<con.size();++i){
-                con.at(i).conexion->eraseConnection(out.at(j),z,con.at(i).bit);
+                con.at(i).conexion->eraseConnection(out.at(j),con.at(i).bit,z);
             }
 
         }
@@ -490,9 +487,12 @@ void Main::erase(){
         for(int z=0;z<in.at(j)->getCantidadBits();++z){
             con = in.at(j)->getAsociado(z);
             for(int i=0;i<con.size();++i){
-                con.at(i).conexion->eraseConnection(out.at(j),z,con.at(i).bit);
+                con.at(i).conexion->eraseConnection(out.at(j),con.at(i).bit,z);
             }
 
         }
     }
+    modulos.replace(index,0);
+    inputs.remove(index);
+    outputs.remove(index);
 }

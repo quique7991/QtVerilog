@@ -7,6 +7,18 @@
 #include "busconnection.h"
 
 class Main;
+class line;
+
+class connection{
+public:
+    connection(line *conexion, int bit):conexion(conexion),bit(bit){}
+    bool operator==(const connection &other) const{
+        return ((this->conexion)==other.conexion)&&((this->bit)==other.bit);
+    }
+    line *conexion;
+    int bit;
+};
+
 
 class line : public QGraphicsItem
 {
@@ -17,15 +29,22 @@ public:
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget);///Función de dibujo de la clase.
     int setConnected(bool con,int key);///Asigna un estado de conectado..
-    int eraseConnection(line *conexion,int key);///Se borra la conexión.
-    int addConnection(line *conexion,int key);//Se agrega una conexipon.
+    int eraseConnection(line *conexion,int key, int from);///Se borra la conexión.
+    int addConnection(line *conexion,int to,int from);//Se agrega una conexipon.
     int setColor(QColor color);///Se asigna el color del cuadrado.
-    QList<line*> getAsociado(int key);///Se obtienen todos los inouts conectados a este.
+    QList<connection> getAsociado(int key);///Se obtienen todos los inouts conectados a este.
     QString getNombre();///Devuelve el nombre.
     bool getConnected();///Devuelve si tiene cualquier tipo de conexión el bus.
     bool getConnected(int key);///Devuelve si algun nodo conectado.
     bool getVarConnected();///devuelve si la variable esta asociada un conectado.
+    bool getBitPosition(line*);
+    bool getTrulyConnected();
+    int setPaintTemp(bool cond){
+        paintTemp=cond;
+        return 0;
+    }
     int getCantidadBits(){return cantidadBits;}
+    bool getIsInput(){return isInput;}
     QColor getColor(){return color;}
 
 protected:
@@ -51,8 +70,7 @@ private:
     QColor color;
     //Lista de nodos conectados a est.
     //QList<line*> asociada;
-    QMultiHash<int,line*> asociada;//Se utiliza un hash para almacenar cada conexión, el numero de bit hace referencia al bit que decodifica al hash, y dado que hay varios valores asocaidos a cada key, se pueden almacenar multiples conexiones.
-    QHash<int,int> posicion; //Si se esta conectando el cable en un bus es necesario indicar a cual de todos los bits.
+    QMultiHash<int,connection> asociada;//Se utiliza un hash para almacenar cada conexión, el numero de bit hace referencia al bit que decodifica al hash, y dado que hay varios valores asocaidos a cada key, se pueden almacenar multiples conexiones.
     ///Nombre del in/out
     QString nombre;
     QList<QPointF> stuff;

@@ -25,6 +25,7 @@ public:
 
 public slots:
     void newOneOneLine(int);
+    void newBlockLine(int);
     
 private slots:
 
@@ -38,6 +39,8 @@ private slots:
 
     void on_spinBox_6_valueChanged(int arg1);
 
+    void on_pushButton_2_clicked();
+
 private:
     Ui::busConnection *ui;
     line *last;
@@ -46,6 +49,13 @@ private:
     QList<QCheckBox*> checkboxOneOne;
     QList<QSpinBox*> QSpinBoxOneOneLeft;
     QList<QSpinBox*> QSpinBoxOneOneRight;
+    int blockCounter;
+    QList<QCheckBox*> checkBoxBlock;
+    QList<QSpinBox*> QSpinBoxBlockInLeft;
+    QList<QSpinBox*> QSpinBoxBlockInRight;
+    QList<QSpinBox*> QSpinBoxBlockOutLeft;
+    QList<QSpinBox*> QSpinBoxBlockOutRight;
 };
 
 #endif // BUSCONNECTION_H
+

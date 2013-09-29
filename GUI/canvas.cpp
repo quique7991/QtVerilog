@@ -387,9 +387,9 @@ void Main::addModulo(QString nombre_arg, int cantidadEntradas_Arg, int cantidadS
     for(int i = 0; i<cantidadSalidas;++i){
          line *lineOutput;
         if(cantidadSalidas !=1)
-            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)/(cantidadSalidas-1)),false,0,&canvas,out[i],1);
+            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)/(cantidadSalidas-1)),false,0,&canvas,out[i],3);
         else
-            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+((minHeight-10)/2),false,0,&canvas,out[i],1);//lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)*2),false,0,&canvas,out[i]);
+            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+((minHeight-10)/2),false,0,&canvas,out[i],3);//lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)*2),false,0,&canvas,out[i]);
         lineOutput->setPos(QPointF(0, 0));
         canvas.addItem(lineOutput);
         lineOutput->setParentItem(rectangulo);
@@ -495,4 +495,8 @@ void Main::erase(){
     modulos.replace(index,0);
     inputs.remove(index);
     outputs.remove(index);
+}
+
+void Main::cleanConnections(){
+    toClean->clearAllConnections();
 }

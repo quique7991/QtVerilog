@@ -56,7 +56,6 @@ QPainterPath line::shape() const
 */
 
 int line::eraseConnection(line *conexion, int key, int from){
-    qDebug()<<"bla";
     connection prueba(conexion,from);
     if(asociada.contains(key,prueba)){
         asociada.remove(key,prueba);
@@ -196,233 +195,252 @@ bool line::getConnected(){
 void line::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     QGraphicsItem::mousePressEvent(event);
-    if(parent->isSecondClick){///Segundo click
-        if(parent->ultimo!=this){
-            if(parent->isBus||(cantidadBits>1)){///Alguno fue un bus
-                if(parent->isInput!=isInput){
-                    ///Abrir ventana para hacer conexiones.
-                    busConnection *conexion= new busConnection(0,this,parent);
-                    this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
-                    conexion->show();
-                }
-                else{///Equivalente al primer click, pero hay que borrar los datos guardados.
-                    if(cantidadBits>1){//Es un bus
-                        if(!(parent->ultimo->getTrulyConnected())){
-
-                            parent->ultimo->setPaintTemp(false);
-                        }
-                        parent->ultimo=this;
-                        parent->isInput=isInput;
+    if(event->button()==Qt::LeftButton){///Se verifica si es un click derecho.
+        if(parent->isSecondClick){///Segundo click
+            if(parent->ultimo!=this){
+                if(parent->isBus||(cantidadBits>1)){///Alguno fue un bus
+                    if(parent->isInput!=isInput){
+                        ///Abrir ventana para hacer conexiones.
+                        busConnection *conexion= new busConnection(0,this,parent);
                         this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
-                        parent->color=this->color;
-                        parent->isValid=true;
-                        parent->isSecondClick=true;
-                        parent->isBus=true;
-                        parent->bitNumber=cantidadBits;
-                        this->paintTemp =true;
+                        conexion->show();
                     }
-                    else{//Es un cable normal
-                        if(!(parent->ultimo->getTrulyConnected())){
-                            if(parent->ultimo->getCantidadBits()>1){
+                    else{///Equivalente al primer click, pero hay que borrar los datos guardados.
+                        if(cantidadBits>1){//Es un bus
+                            if(!(parent->ultimo->getTrulyConnected())){
+
                                 parent->ultimo->setPaintTemp(false);
                             }
-                            else{
-                                parent->ultimo->setConnected(false,0);
-                            }
-                        }
-                        parent->ultimo=0;
-                        parent->isValid=false;
-                        parent->isSecondClick=false;
-                        if(event->modifiers()==Qt::ControlModifier){///Click especial
-                            if(isConnected[0]&&(!isInput)){///Si ya se encuentra conetado, y es una salida.
-                                ///>Se almacenan las variables en la escena padre.
-                                parent->ultimo=this;
-                                parent->isInput=this;
-                                parent->color=this->color;
-                                ///>Se asignan las variables que indican que el siguiente boton es el segundo click.
-                                parent->isValid=true;
-                                parent->isSecondClick=true;
-                                parent->bitNumber=0;
-                                parent->isBus=false;
-                            }
-                            else{///Equivalente a un click sencillo.
-                                QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
-                                for(int i=0;i<borrar.size();++i){
-                                    borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
-                                }
-                                this->asociada.remove(0);///Se limpia la lista de conexiones.
-                                ///>Se almacenan las variables para indicar que el siguiente click es el segundo click del botón.
-                                isConnected[0]=true;
-                                parent->isValid=true;
-                                parent->isSecondClick=true;
-                                //>Se asignan las variables a la escena padre.
-                                parent->ultimo=this;
-                                ///>Se generá el color del cuadrado.
-                                this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
-                                parent->color=this->color;
-                                parent->isInput=isInput;
-                                parent->bitNumber=0;
-                                parent->isBus=false;
-                            }
-                        }
-                        else{///Click Sencillo
-                            QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
-                            for(int i=0;i<borrar.size();++i){
-                                borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
-                            }
-                            this->asociada.remove(0);///Se limpia la lista de conexiones.
-                            ///>Se almacenan las variables y se asignan los colores al presente.
-                            isConnected[0]=true;
-                            parent->isValid=true;
-                            parent->isSecondClick=true;
                             parent->ultimo=this;
                             parent->isInput=isInput;
                             this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
                             parent->color=this->color;
-                            parent->isBus=false;
-                            parent->bitNumber=0;
+                            parent->isValid=true;
+                            parent->isSecondClick=true;
+                            parent->isBus=true;
+                            parent->bitNumber=cantidadBits;
+                            this->paintTemp =true;
                         }
-                    }
-                }
-            }
-            else{///Ninguno fue un bus, entonces es una conexion de 1 bit a 1 bit.
-                if(parent->ultimo!=this){//Se verifica que el segundo botón no sea el primero.
-                    if(parent->isInput!=isInput){///Se verifica si el anterior es del tipo distinto, solo se puede conectar input->output, output->input.
-                        if(event->modifiers()==Qt::ControlModifier){///Click especial
-                            if(isConnected[0]){///Esta conectado
-                                if(isInput){//Si es entrada
+                        else{//Es un cable normal
+                            if(!(parent->ultimo->getTrulyConnected())){
+                                if(parent->ultimo->getCantidadBits()>1){
+                                    parent->ultimo->setPaintTemp(false);
+                                }
+                                else{
+                                    parent->ultimo->setConnected(false,0);
+                                }
+                            }
+                            parent->ultimo=0;
+                            parent->isValid=false;
+                            parent->isSecondClick=false;
+                            if(event->modifiers()==Qt::ControlModifier){///Click especial
+                                if(isConnected[0]&&(!isInput)){///Si ya se encuentra conetado, y es una salida.
+                                    ///>Se almacenan las variables en la escena padre.
+                                    parent->ultimo=this;
+                                    parent->isInput=this;
+                                    parent->color=this->color;
+                                    ///>Se asignan las variables que indican que el siguiente boton es el segundo click.
+                                    parent->isValid=true;
+                                    parent->isSecondClick=true;
+                                    parent->bitNumber=0;
+                                    parent->isBus=false;
+                                }
+                                else{///Equivalente a un click sencillo.
                                     QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
                                     for(int i=0;i<borrar.size();++i){
                                         borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
                                     }
                                     this->asociada.remove(0);///Se limpia la lista de conexiones.
-                                    ///>Se conectan los dos nodos (this y el que ya se encontraba almacenado en el parent.
+                                    ///>Se almacenan las variables para indicar que el siguiente click es el segundo click del botón.
+                                    isConnected[0]=true;
+                                    parent->isValid=true;
+                                    parent->isSecondClick=true;
+                                    //>Se asignan las variables a la escena padre.
+                                    parent->ultimo=this;
+                                    ///>Se generá el color del cuadrado.
+                                    this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
+                                    parent->color=this->color;
+                                    parent->isInput=isInput;
+                                    parent->bitNumber=0;
+                                    parent->isBus=false;
+                                }
+                            }
+                            else{///Click Sencillo
+                                QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
+                                for(int i=0;i<borrar.size();++i){
+                                    borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
+                                }
+                                this->asociada.remove(0);///Se limpia la lista de conexiones.
+                                ///>Se almacenan las variables y se asignan los colores al presente.
+                                isConnected[0]=true;
+                                parent->isValid=true;
+                                parent->isSecondClick=true;
+                                parent->ultimo=this;
+                                parent->isInput=isInput;
+                                this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
+                                parent->color=this->color;
+                                parent->isBus=false;
+                                parent->bitNumber=0;
+                            }
+                        }
+                    }
+                }
+                else{///Ninguno fue un bus, entonces es una conexion de 1 bit a 1 bit.
+                    if(parent->ultimo!=this){//Se verifica que el segundo botón no sea el primero.
+                        if(parent->isInput!=isInput){///Se verifica si el anterior es del tipo distinto, solo se puede conectar input->output, output->input.
+                            if(event->modifiers()==Qt::ControlModifier){///Click especial
+                                if(isConnected[0]){///Esta conectado
+                                    if(isInput){//Si es entrada
+                                        QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
+                                        for(int i=0;i<borrar.size();++i){
+                                            borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
+                                        }
+                                        this->asociada.remove(0);///Se limpia la lista de conexiones.
+                                        ///>Se conectan los dos nodos (this y el que ya se encontraba almacenado en el parent.
+                                        this->color=parent->color;
+                                        this->addConnection(parent->ultimo,0,0);
+                                        parent->ultimo->addConnection(this,0,0);
+                                    }
+                                    else{///>Si es una salida, pueden haber muchos inputs a una misma salida.
+                                    ///>Si lo se agrega a la lista del input almacenado en el parent
+                                        parent->ultimo->setColor(this->color);
+                                        parent->ultimo->addConnection(this,0,0);
+                                        this->addConnection(parent->ultimo,0,0);
+                                    }
+                                }
+                                else{///Esta desconectado.
+                                    ///Se conectan a ambos nodos indiferente de cualquier otra característica.
                                     this->color=parent->color;
                                     this->addConnection(parent->ultimo,0,0);
                                     parent->ultimo->addConnection(this,0,0);
                                 }
-                                else{///>Si es una salida, pueden haber muchos inputs a una misma salida.
-                                ///>Si lo se agrega a la lista del input almacenado en el parent
-                                    parent->ultimo->setColor(this->color);
-                                    parent->ultimo->addConnection(this,0,0);
-                                    this->addConnection(parent->ultimo,0,0);
-                                }
                             }
-                            else{///Esta desconectado.
-                                ///Se conectan a ambos nodos indiferente de cualquier otra característica.
+                            else{///Click sencillo.
+                                QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
+                                if(isConnected[0]){///>Si se encuentra conectado.                    QList<*line> borrar = asociada.value(0);///Se obtienen todas las lineas asociadas.
+                                    for(int i=0;i<borrar.size();++i){
+                                        borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
+                                    }
+                                    this->asociada.remove(0);///Se limpia la lista de conexiones.
+                                }
+                                ///Se conecta este nodo con el nodo anterior.
                                 this->color=parent->color;
                                 this->addConnection(parent->ultimo,0,0);
                                 parent->ultimo->addConnection(this,0,0);
                             }
+                            parent->ultimo->update();///Se actualiza el nodo al que se conecto.
+                            ///>Se limpian las variables en la escena padre.
+                            parent->ultimo=0;
+                            parent->isValid=false;
+                            parent->isSecondClick=false;
                         }
-                        else{///Click sencillo.
-                            QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
-                            if(isConnected[0]){///>Si se encuentra conectado.                    QList<*line> borrar = asociada.value(0);///Se obtienen todas las lineas asociadas.
-                                for(int i=0;i<borrar.size();++i){
-                                    borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
+                        else{///Si son iguales en tipo (input,output), se va a un paso equivalente a quere fuera un primer click
+                            if(!(parent->ultimo->getTrulyConnected())){
+                                parent->ultimo->setConnected(false,0);
+                            }
+                            parent->ultimo=0;
+                            parent->isValid=false;
+                            parent->isSecondClick=false;
+                            if(event->modifiers()==Qt::ControlModifier){///Click especial
+                                if(isConnected[0]&&(!isInput)){///Si ya se encuentra conetado, y es una salida.
+                                    ///>Se almacenan las variables en la escena padre.
+                                    parent->ultimo=this;
+                                    parent->isInput=this;
+                                    parent->color=this->color;
+                                    ///>Se asignan las variables que indican que el siguiente boton es el segundo click.
+                                    parent->isValid=true;
+                                    parent->isSecondClick=true;
+                                    parent->bitNumber=0;
+                                    parent->isBus=false;
                                 }
-                                this->asociada.remove(0);///Se limpia la lista de conexiones.
+                                else{///Equivalente a un click sencillo.
+                                    QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
+                                    for(int i=0;i<borrar.size();++i){
+                                        borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
+                                    }
+                                    this->asociada.remove(0);///Se limpia la lista de conexiones.
+                                    ///>Se almacenan las variables para indicar que el siguiente click es el segundo click del botón.
+                                    isConnected[0]=true;
+                                    parent->isValid=true;
+                                    parent->isSecondClick=true;
+                                    //>Se asignan las variables a la escena padre.
+                                    parent->ultimo=this;
+                                    ///>Se generá el color del cuadrado.
+                                    this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
+                                    parent->color=this->color;
+                                    parent->isInput=isInput;
+                                    parent->bitNumber=0;
+                                    parent->isBus=false;
+                                }
                             }
-                            ///Se conecta este nodo con el nodo anterior.
-                            this->color=parent->color;
-                            this->addConnection(parent->ultimo,0,0);
-                            parent->ultimo->addConnection(this,0,0);
-                        }
-                        parent->ultimo->update();///Se actualiza el nodo al que se conecto.
-                        ///>Se limpian las variables en la escena padre.
-                        parent->ultimo=0;
-                        parent->isValid=false;
-                        parent->isSecondClick=false;
-                    }
-                    else{///Si son iguales en tipo (input,output), se va a un paso equivalente a quere fuera un primer click
-                        if(!(parent->ultimo->getTrulyConnected())){
-                            parent->ultimo->setConnected(false,0);
-                        }
-                        parent->ultimo=0;
-                        parent->isValid=false;
-                        parent->isSecondClick=false;
-                        if(event->modifiers()==Qt::ControlModifier){///Click especial
-                            if(isConnected[0]&&(!isInput)){///Si ya se encuentra conetado, y es una salida.
-                                ///>Se almacenan las variables en la escena padre.
-                                parent->ultimo=this;
-                                parent->isInput=this;
-                                parent->color=this->color;
-                                ///>Se asignan las variables que indican que el siguiente boton es el segundo click.
-                                parent->isValid=true;
-                                parent->isSecondClick=true;
-                                parent->bitNumber=0;
-                                parent->isBus=false;
-                            }
-                            else{///Equivalente a un click sencillo.
+                            else{///Click Sencillo
                                 QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
                                 for(int i=0;i<borrar.size();++i){
-                                    borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
+                                     borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
                                 }
                                 this->asociada.remove(0);///Se limpia la lista de conexiones.
-                                ///>Se almacenan las variables para indicar que el siguiente click es el segundo click del botón.
+                                ///>Se almacenan las variables y se asignan los colores al presente.
                                 isConnected[0]=true;
                                 parent->isValid=true;
                                 parent->isSecondClick=true;
-                                //>Se asignan las variables a la escena padre.
                                 parent->ultimo=this;
-                                ///>Se generá el color del cuadrado.
+                                parent->isInput=isInput;
                                 this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
                                 parent->color=this->color;
-                                parent->isInput=isInput;
-                                parent->bitNumber=0;
                                 parent->isBus=false;
+                                parent->bitNumber=0;
                             }
-                        }
-                        else{///Click Sencillo
-                            QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
-                            for(int i=0;i<borrar.size();++i){
-                                 borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
-                            }
-                            this->asociada.remove(0);///Se limpia la lista de conexiones.
-                            ///>Se almacenan las variables y se asignan los colores al presente.
-                            isConnected[0]=true;
-                            parent->isValid=true;
-                            parent->isSecondClick=true;
-                            parent->ultimo=this;
-                            parent->isInput=isInput;
-                            this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
-                            parent->color=this->color;
-                            parent->isBus=false;
-                            parent->bitNumber=0;
                         }
                     }
                 }
             }
         }
-    }
-    else{////Primer Click
-        if(cantidadBits>1){//Es un bus
-            parent->ultimo=this;
-            parent->isInput=isInput;
-            this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
-            parent->color=this->color;
-            parent->isValid=true;
-            parent->isSecondClick=true;
-            parent->isBus=true;
-            parent->bitNumber=cantidadBits;
-            this->paintTemp =true;
-        }
-        else{///Es un bit, no un bus
-            if(event->modifiers()==Qt::ControlModifier){///Click especial
-                if(isConnected[0]&&(!isInput)){///Si ya se encuentra conetado, y es una salida.
-                    ///>Solo se alamacenan los valores al parent.
-                    parent->ultimo=this;
-                    parent->isInput=isInput;
-                    parent->color=this->color;
-                    parent->isValid=true;
-                    parent->isSecondClick=true;
-                    parent->isBus=false;
-                    parent->bitNumber=0;
+        else{////Primer Click
+            if(cantidadBits>1){//Es un bus
+                parent->ultimo=this;
+                parent->isInput=isInput;
+                this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
+                parent->color=this->color;
+                parent->isValid=true;
+                parent->isSecondClick=true;
+                parent->isBus=true;
+                parent->bitNumber=cantidadBits;
+                this->paintTemp =true;
+            }
+            else{///Es un bit, no un bus
+                if(event->modifiers()==Qt::ControlModifier){///Click especial
+                    if(isConnected[0]&&(!isInput)){///Si ya se encuentra conetado, y es una salida.
+                        ///>Solo se alamacenan los valores al parent.
+                        parent->ultimo=this;
+                        parent->isInput=isInput;
+                        parent->color=this->color;
+                        parent->isValid=true;
+                        parent->isSecondClick=true;
+                        parent->isBus=false;
+                        parent->bitNumber=0;
+                    }
+                    else{///Equivalente a un click sencillo.
+                        QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
+                        for(int i=0;i<borrar.size();++i){
+                            borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
+                        }
+                        this->asociada.remove(0);///Se limpia la lista de conexiones.
+                        ///>Se asignan los valores del cuadrado y de conexión tanto al padre como a *this.
+                        isConnected[0]=true;
+                        parent->isValid=true;
+                        parent->isSecondClick=true;
+                        parent->ultimo=this;
+                        parent->bitNumber=0;
+                        parent->isBus=0;
+                        parent->isInput=isInput;
+                        this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
+                        parent->color=this->color;
+                    }
                 }
-                else{///Equivalente a un click sencillo.
+                else{///Click Sencillo
                     QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
                     for(int i=0;i<borrar.size();++i){
-                        borrar.at(i).conexion->eraseConnection(this,0,borrar.at(i).bit);///Se borran las conexiones.
+                        borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
                     }
                     this->asociada.remove(0);///Se limpia la lista de conexiones.
                     ///>Se asignan los valores del cuadrado y de conexión tanto al padre como a *this.
@@ -430,33 +448,40 @@ void line::mousePressEvent(QGraphicsSceneMouseEvent *event)
                     parent->isValid=true;
                     parent->isSecondClick=true;
                     parent->ultimo=this;
-                    parent->bitNumber=0;
-                    parent->isBus=0;
                     parent->isInput=isInput;
                     this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
                     parent->color=this->color;
+                    parent->isBus=false;
+                    parent->bitNumber=0;
                 }
-            }
-            else{///Click Sencillo
-                QList<connection> borrar = asociada.values(0);///Se obtienen todas las lineas asociadas.
-                for(int i=0;i<borrar.size();++i){
-                    borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,0);///Se borran las conexiones.
-                }
-                this->asociada.remove(0);///Se limpia la lista de conexiones.
-                ///>Se asignan los valores del cuadrado y de conexión tanto al padre como a *this.
-                isConnected[0]=true;
-                parent->isValid=true;
-                parent->isSecondClick=true;
-                parent->ultimo=this;
-                parent->isInput=isInput;
-                this->color=QColor(qrand()%32*8,qrand()%32*8,qrand()%32*8);
-                parent->color=this->color;
-                parent->isBus=false;
-                parent->bitNumber=0;
             }
         }
     }
+    else{
+        QMenu* contextMenu = new QMenu ();///Se crea un menu de contexto.
+        Q_CHECK_PTR ( contextMenu );
+        parent->setLineToClean(this);
+        contextMenu->addAction ( "Borrar Conexiones" , parent , SLOT (cleanConnections() ));//Se agrega la opción de analizar la jerarquía.
+        contextMenu->popup( QCursor::pos() );
+        contextMenu->exec ();
+        delete contextMenu;
+        contextMenu = 0;
+    }
     update();///>Se actualiza la línea.
+}
+
+int line::clearAllConnections(){
+    QList<connection> borrar;
+    for(int j=0;j<cantidadBits;++j){
+        borrar = asociada.values(j);///Se obtienen todas las lineas asociadas.
+        for(int i=0;i<borrar.size();++i){
+            borrar.at(i).conexion->eraseConnection(this,borrar.at(i).bit,j);///Se borran las conexiones.
+        }
+        asociada.remove(j);
+        isConnected[j]=false;
+    }
+    update();
+    return 0;
 }
 
 void line::mouseMoveEvent(QGraphicsSceneMouseEvent *event)

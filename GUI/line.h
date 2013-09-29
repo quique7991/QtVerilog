@@ -15,6 +15,7 @@ public:
     bool operator==(const connection &other) const{
         return ((this->conexion)==other.conexion)&&((this->bit)==other.bit);
     }
+    int clearAllConnections();
     line *conexion;
     int bit;
 };
@@ -46,6 +47,7 @@ public:
     int getCantidadBits(){return cantidadBits;}
     bool getIsInput(){return isInput;}
     QColor getColor(){return color;}
+    int clearAllConnections();
 
 protected:
     ///Eventos de mouse

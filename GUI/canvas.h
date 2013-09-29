@@ -45,6 +45,10 @@ public:
     Main(QGraphicsScene&, QWidget* parent=0, Qt::WindowFlags f=0);
     ~Main();
     int setActualItem(Core *Item);
+    int setLineToClean(line *toClean){
+        this->toClean = toClean;
+        return 0;
+    }
     line *ultimo;
     bool isValid;
     bool isBus;
@@ -60,6 +64,7 @@ public slots:
     void help();
     void erase();
     void downHierarchie();
+    void cleanConnections();
 
 private slots:
     void aboutQt();
@@ -89,6 +94,7 @@ private:
     FigureEditor *editor;
     Core *actualItem;
     QMenu* options;
+    line *toClean;
     void AddModulesToDB(Parser &);
     void addModulo(QString , int , int , QVector<QString> &in, QVector<QString> &out);//(int x, int y, QString nombre, int cantidadEntradas, int cantidadSalidas, QString direccionImagen, QColor color, QString *in, QString *out);
 #if !defined(Q_OS_SYMBIAN)

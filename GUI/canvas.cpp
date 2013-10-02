@@ -20,6 +20,8 @@
 #include <QFileDialog>
 #include <QtSql>
 #include <iostream>
+#include <QFile>
+#include <QTextStream>
 #include "canvas.h"
 #include "line.h"
 #include "core.h"
@@ -117,7 +119,7 @@ Main::Main(QGraphicsScene& c, QWidget* parent, Qt::WindowFlags f) :
     QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
     db.setHostName("localhost");
     db.setDatabaseName("Prueba");
-    db.setUserName("prueba");
+    db.setUserName("root");
     db.setPassword("KarenPa0la");
     if(!db.open()){
         QMessageBox::critical(this, tr("DB Error"),tr("Could not login to db"),QMessageBox::Ok);
@@ -127,7 +129,7 @@ Main::Main(QGraphicsScene& c, QWidget* parent, Qt::WindowFlags f) :
 
     setCentralWidget(editor);
 
-    QSqlQuery Query("create table IF NOT EXISTS Modules(id int unsigned not null auto_increment, Name varchar(30) not null, Inputs int not null, Outputs int not null, ImageFile varchar(30), PortInfoFile varchar(30), primary key(id))");
+    QSqlQuery Query("create table Modules(id int unsigned not null auto_increment, Name varchar(30) not null, Inputs int not null, Outputs int not null, ImageFile varchar(200), PortInfoFile varchar(200), primary key(id), unique key(Name))");
 
 #if !defined(Q_OS_SYMBIAN)
     printer = 0;
@@ -253,9 +255,9 @@ void Main::addSpriteMine()
     i->setZValue(qrand()%256);
 }
 
-QList<QGraphicsItem*> modulos;
+/*QList<QGraphicsItem*> modulos;
 QMultiHash<int,line*> conexiones;
-
+*/
 void Main::ProcessModules(){
     QString filename = QFileDialog::getOpenFileName();
     Parser pars(filename);
@@ -269,11 +271,29 @@ void Main::AddModulesToDB(Parser &pars){
     QString Query = "";
     for(int i = 0; i<pars.ModulesIF.size(); ++i){
         QString ModName = pars.ModulesIF[i].Name;
+        QString FileName("/home/hugo/Desktop/QtVerilogFiles/."+ModName);
+        QFile file(FileName);
+        file.open(QIODevice::WriteOnly | QIODevice::Text);
+        QTextStream out(&file);
         std::cout<<"Module:"<<ModName.toStdString()<<std::endl;
-        Query.append(QString("INSERT INTO Modules (Name, Inputs, Outputs) VALUES ('%1','%2','%3')").arg(ModName).arg(pars.ModulesIF[i].InputsTotal).arg(pars.ModulesIF[i].OutputsTotal));
+        Query.append(QString("INSERT INTO Modules (Name, Inputs, Outputs,PortInfoFile) VALUES ('%1','%2','%3','%4')").arg(ModName).arg(pars.ModulesIF[i].Inputs.size()).arg(pars.ModulesIF[i].Outputs.size()).arg(FileName));
+        QSqlQuery Condition(QString("SELECT * FROM Modules where Name='%1'").arg(ModName));
         std::cout<<Query.toStdString()<<std::endl;
-        QSqlQuery QuerySql(Query);
+        if(Condition.size())
+            std::cout<<"No Funciona"<<std::endl;
+        else{
+            QSqlQuery QuerySql(Query);
+            for(int p = 0; p < pars.ModulesIF[i].Inputs.size(); ++p){
+                out << pars.ModulesIF[i].Inputs[p].Name << ":" << pars.ModulesIF[i].Inputs[p].BusWidth << ";";
+            }
+            out<<"\n";
+            for(int p = 0; p < pars.ModulesIF[i].Outputs.size(); ++p){
+                out << pars.ModulesIF[i].Outputs[p].Name << ":" << pars.ModulesIF[i].Outputs[p].BusWidth << ";";
+            }
+            out<<"\nFinPuertos";
+        }
         Query.clear();
+        Condition.clear();
     }
 }
 
@@ -282,18 +302,30 @@ void Main::DropModuleFromDB(){
     if(Dialog.exec() == QDialog::Accepted){
         QString QueryTemp("SELECT * from Modules WHERE id=");
         QueryTemp += QString::number(Dialog.Location4+1);
-        std::cout<<QueryTemp.toStdString()<<std::endl;
-        std::cout << Dialog.Location4 << std::endl ;
         QSqlQuery Query(QueryTemp);
         QVector<QString> inputs, outputs;
         while(Query.next()){
-        for(int i = 0 ; i<Query.value(2).toInt(); ++i){
-            inputs << QString("IN")+QString::number(i+1);
-        }
-        for(int i = 0; i<Query.value(3).toInt(); ++i)
-            outputs << QString("OUT")+QString::number(i+1);
-
-        addModulo(Query.value(1).toString(), Query.value(2).toInt(), Query.value(3).toInt(), inputs, outputs);
+            qDebug()<<Query.value(5).toString();
+            QFile file(Query.value(5).toString());
+            file.open(QIODevice::ReadOnly | QIODevice::Text);
+            QTextStream in(&file);
+            int counter = 0;
+            while(!in.atEnd()){
+                QString Ports(in.readLine());
+                if(Ports == "FinPuertos"){
+                    break;
+                }
+                QList<QString> Prueba = Ports.split(';');
+                for(int j = 0; j < Prueba.size();++j){
+                    qDebug()<<Prueba[j];
+                }
+                if(!counter)
+                    inputs = QVector<QString>::fromList(Prueba);
+                else
+                    outputs = QVector<QString>::fromList(Prueba);
+                counter++;
+            }
+            addModulo(Query.value(1).toString(), Query.value(2).toInt(), Query.value(3).toInt(), inputs, outputs);
         }
     }
 }
@@ -305,31 +337,18 @@ void Main::DropModuleFromFile(){
     int row;
     if(Dialog.exec() == QDialog::Accepted){
         row = Dialog.Location;
-        QVector<QString> inputs(pars.ModulesIF[row].InputsTotal);
-        QVector<QString> outputs(pars.ModulesIF[row].OutputsTotal);
-        QString Temp;
-        int temp = 0;
+        QVector<QString> inputs(pars.ModulesIF[row].Inputs.size());
+        QVector<QString> outputs(pars.ModulesIF[row].Outputs.size());
         for(int i = 0; i<pars.ModulesIF[row].Inputs.size(); ++i){
-            for(int j = 0; j < pars.ModulesIF[row].Inputs[i].BusWidth; ++j){
-                Temp = pars.ModulesIF[row].Inputs[i].Name+QString::number(j);
-                inputs[temp] = Temp;
-                Temp.clear();
-                temp += 1;
-            }
+            inputs[i]= pars.ModulesIF[row].Inputs[i].Name+":"+QString::number(pars.ModulesIF[row].Inputs[i].BusWidth);
         }
 
-        temp = 0;
         for(int i = 0; i<pars.ModulesIF[row].Outputs.size(); ++i){
-            for(int j = 0; j < pars.ModulesIF[row].Outputs[i].BusWidth; ++j){
-                Temp = pars.ModulesIF[row].Outputs[i].Name+QString::number(j);
-                outputs[temp] += Temp;
-                Temp.clear();
-                temp += 1;
-            }
+            outputs[i] = pars.ModulesIF[row].Outputs[i].Name+":"+QString::number(pars.ModulesIF[row].Outputs[i].BusWidth);
         }
         QString name_arg = pars.ModulesIF[row].Name;
-        int InputsQuant = pars.ModulesIF[row].InputsTotal;
-        int OutputsQuant = pars.ModulesIF[row].OutputsTotal;
+        int InputsQuant = pars.ModulesIF[row].Inputs.size();
+        int OutputsQuant = pars.ModulesIF[row].Outputs.size();
         addModulo(name_arg, InputsQuant, OutputsQuant, inputs, outputs);
     }
 
@@ -344,7 +363,7 @@ void Main::addModulo(QString nombre_arg, int cantidadEntradas_Arg, int cantidadS
     int cantidadSalidas = cantidadSalidas_Arg;
     int width=150;
     int height=150;
-    QString direccionImagen = "/home/quique/Desktop/QtVerilog/GUI/images.jpeg";
+    QString direccionImagen = "/home/hugo/Desktop/QtVerilog/GUI/images.jpeg";
     QColor color = Qt::blue;
     int minHeight = 100;
     if(cantidadEntradas>cantidadSalidas){
@@ -375,10 +394,12 @@ void Main::addModulo(QString nombre_arg, int cantidadEntradas_Arg, int cantidadS
     ///Shadows
     for(int i = 0; i<cantidadEntradas;++i){
         line *lineInput;
-        if(cantidadEntradas !=1 )
-            lineInput = new line(this,Qt::black,x,x+20-1,y+18+i*((minHeight-10)/(cantidadEntradas-1)),true,0,&canvas,in[i],3);
+        QStringList NamWidth = in[i].split(":");
+        std::cout<<"LLegue Aqui"<<std::endl;
+        if(cantidadEntradas != 1 || NamWidth[1].toInt() != 1)
+            lineInput = new line(this,Qt::black,x,x+20-1,y+18+i*((minHeight-10)/(cantidadEntradas-1)),true,0,&canvas,NamWidth[0],NamWidth[1].toInt());
         else
-            lineInput = new line(this,Qt::black,x,x+20-1,y+18+((minHeight-10)/2),true,0,&canvas,in[i],3);
+            lineInput = new line(this,Qt::black,x,x+20-1,y+18+((minHeight-10)/2),true,0,&canvas,NamWidth[0],NamWidth[1].toInt());
         lineInput->setPos(QPointF(0, 0));
         canvas.addItem(lineInput);
         lineInput->setParentItem(rectangulo);
@@ -386,10 +407,11 @@ void Main::addModulo(QString nombre_arg, int cantidadEntradas_Arg, int cantidadS
     }
     for(int i = 0; i<cantidadSalidas;++i){
          line *lineOutput;
+         QStringList NamWidth = out[i].split(":");
         if(cantidadSalidas !=1)
-            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)/(cantidadSalidas-1)),false,0,&canvas,out[i],3);
+            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)/(cantidadSalidas-1)),false,0,&canvas,NamWidth[0],NamWidth[1].toInt());
         else
-            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+((minHeight-10)/2),false,0,&canvas,out[i],3);//lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)*2),false,0,&canvas,out[i]);
+            lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+((minHeight-10)/2),false,0,&canvas,NamWidth[0],NamWidth[1].toInt());//lineOutput = new line(this,Qt::black,x+21+minWidth,x+41+minWidth,y+18+i*((minHeight-10)*2),false,0,&canvas,out[i]);
         lineOutput->setPos(QPointF(0, 0));
         canvas.addItem(lineOutput);
         lineOutput->setParentItem(rectangulo);
@@ -426,7 +448,7 @@ void Main::print2(){
                     }
                 }
                 else{
-                    qDebug()<<"Sin Conexión";
+                    qDebug()<<"Sin Conexion";
                 }
             }
             QList<line*> values = outputs.values(i);

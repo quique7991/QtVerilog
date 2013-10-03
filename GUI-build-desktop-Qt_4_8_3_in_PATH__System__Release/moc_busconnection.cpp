@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'busconnection.h'
 **
-** Created: Tue Oct 1 10:13:36 2013
+** Created: Thu Oct 3 04:56:02 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.3)
 **
 ** WARNING! All changes made in this file will be lost!

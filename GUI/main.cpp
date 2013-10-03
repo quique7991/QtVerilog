@@ -59,7 +59,7 @@ int main(int argc, char** argv)
        
     QGraphicsScene canvas;
     canvas.setSceneRect(0, 0, 800, 600);
-    Main m(canvas);
+    Main m(&canvas);
     m.resize(m.sizeHint());
     m.setWindowTitle("Graphics Verilog Module Editor");
 

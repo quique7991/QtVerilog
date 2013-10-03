@@ -1,15 +1,15 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'fromfile.h'
+** Meta object code from reading C++ file 'hierarchidialog.h'
 **
-** Created: Wed Oct 2 22:53:55 2013
+** Created: Wed Oct 2 22:19:56 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.3)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../GUI/fromfile.h"
+#include "hierarchidialog.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'fromfile.h' doesn't include <QObject>."
+#error "The header file 'hierarchidialog.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 63
 #error "This file was generated using the moc from 4.8.3. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -17,7 +17,7 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-static const uint qt_meta_data_FromFile[] = {
+static const uint qt_meta_data_HierarchiDialog[] = {
 
  // content:
        6,       // revision
@@ -31,20 +31,20 @@ static const uint qt_meta_data_FromFile[] = {
        0,       // signalCount
 
  // slots: signature, parameters, type, tag, flags
-      10,    9,    9,    9, 0x08,
+      17,   16,   16,   16, 0x08,
 
        0        // eod
 };
 
-static const char qt_meta_stringdata_FromFile[] = {
-    "FromFile\0\0on_tableWidget_itemSelectionChanged()\0"
+static const char qt_meta_stringdata_HierarchiDialog[] = {
+    "HierarchiDialog\0\0on_tableWidget_itemSelectionChanged()\0"
 };
 
-void FromFile::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void HierarchiDialog::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
         Q_ASSERT(staticMetaObject.cast(_o));
-        FromFile *_t = static_cast<FromFile *>(_o);
+        HierarchiDialog *_t = static_cast<HierarchiDialog *>(_o);
         switch (_id) {
         case 0: _t->on_tableWidget_itemSelectionChanged(); break;
         default: ;
@@ -53,33 +53,33 @@ void FromFile::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, vo
     Q_UNUSED(_a);
 }
 
-const QMetaObjectExtraData FromFile::staticMetaObjectExtraData = {
+const QMetaObjectExtraData HierarchiDialog::staticMetaObjectExtraData = {
     0,  qt_static_metacall 
 };
 
-const QMetaObject FromFile::staticMetaObject = {
-    { &QDialog::staticMetaObject, qt_meta_stringdata_FromFile,
-      qt_meta_data_FromFile, &staticMetaObjectExtraData }
+const QMetaObject HierarchiDialog::staticMetaObject = {
+    { &QDialog::staticMetaObject, qt_meta_stringdata_HierarchiDialog,
+      qt_meta_data_HierarchiDialog, &staticMetaObjectExtraData }
 };
 
 #ifdef Q_NO_DATA_RELOCATION
-const QMetaObject &FromFile::getStaticMetaObject() { return staticMetaObject; }
+const QMetaObject &HierarchiDialog::getStaticMetaObject() { return staticMetaObject; }
 #endif //Q_NO_DATA_RELOCATION
 
-const QMetaObject *FromFile::metaObject() const
+const QMetaObject *HierarchiDialog::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->metaObject : &staticMetaObject;
 }
 
-void *FromFile::qt_metacast(const char *_clname)
+void *HierarchiDialog::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_FromFile))
-        return static_cast<void*>(const_cast< FromFile*>(this));
+    if (!strcmp(_clname, qt_meta_stringdata_HierarchiDialog))
+        return static_cast<void*>(const_cast< HierarchiDialog*>(this));
     return QDialog::qt_metacast(_clname);
 }
 
-int FromFile::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int HierarchiDialog::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QDialog::qt_metacall(_c, _id, _a);
     if (_id < 0)

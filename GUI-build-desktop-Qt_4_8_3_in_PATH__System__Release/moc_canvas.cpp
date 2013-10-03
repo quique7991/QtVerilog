@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'canvas.h'
 **
-** Created: Tue Oct 1 10:13:34 2013
+** Created: Thu Oct 3 04:56:01 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.3)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -103,7 +103,7 @@ static const uint qt_meta_data_Main[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-      25,   14, // methods
+      26,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -136,6 +136,7 @@ static const uint qt_meta_data_Main[] = {
      247,    5,    5,    5, 0x08,
      266,    5,    5,    5, 0x08,
      287,    5,    5,    5, 0x08,
+     304,    5,    5,    5, 0x08,
 
        0        // eod
 };
@@ -149,6 +150,7 @@ static const char qt_meta_stringdata_Main[] = {
     "zoomOut()\0mirror()\0moveL()\0moveR()\0"
     "moveU()\0moveD()\0print()\0DropModuleFromDB()\0"
     "DropModuleFromFile()\0ProcessModules()\0"
+    "ChangeScene()\0"
 };
 
 void Main::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -182,6 +184,7 @@ void Main::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
         case 22: _t->DropModuleFromDB(); break;
         case 23: _t->DropModuleFromFile(); break;
         case 24: _t->ProcessModules(); break;
+        case 25: _t->ChangeScene(); break;
         default: ;
         }
     }
@@ -220,9 +223,9 @@ int Main::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 25)
+        if (_id < 26)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 25;
+        _id -= 26;
     }
     return _id;
 }

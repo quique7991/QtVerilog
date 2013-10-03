@@ -54,14 +54,16 @@
 int main(int argc, char** argv)
 {
     Q_INIT_RESOURCE(portedcanvas);
-
+    ///Se inicializa el app
     QApplication app(argc,argv);
-       
+    ///Se inicializa el canvas
     QGraphicsScene canvas;
+    ///Se define el tamaño inicial del canvas.
     canvas.setSceneRect(0, 0, 800, 600);
+    //Se crea la ventana con el presente cavnas.
     Main m(canvas);
-    m.resize(m.sizeHint());
-    m.setWindowTitle("Graphics Verilog Module Editor");
+    m.resize(m.sizeHint());///Se define el tamaño
+    m.setWindowTitle("Graphics Verilog Module Editor");///Se asigna eln ombre al aventana
 
 #if defined(Q_OS_SYMBIAN)
     m.showMaximized();
@@ -70,7 +72,7 @@ int main(int argc, char** argv)
 #else
     if ( QApplication::desktop()->width() > m.width() + 10
 	&& QApplication::desktop()->height() > m.height() +30 )
-	m.show();
+    m.show();///Se muestra la ventana
     else
 	m.showMaximized();
 #endif

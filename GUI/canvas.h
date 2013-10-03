@@ -12,6 +12,7 @@
 #include <QGraphicsItem>
 #include "line.h"
 #include "core.h"
+class Instance;
 class Parser;
 class line;
 class Core;
@@ -42,7 +43,7 @@ class Main : public QMainWindow {
     Q_OBJECT
 
 public:
-    Main(QGraphicsScene&, QWidget* parent=0, Qt::WindowFlags f=0);
+    Main(QGraphicsScene *canvas1,QWidget* parent=0, Qt::WindowFlags f=0);
     ~Main();
     int setActualItem(Core *Item);
     int setLineToClean(line *toClean){
@@ -56,9 +57,14 @@ public:
     bool isSecondClick;
     bool isInput;
     QColor color;
-    QList<QGraphicsTextItem*> modulos;
+    QList<QGraphicsTextItem*> modulos, *modulosH;
     QMultiHash<int,line*> inputs;
     QMultiHash<int,line*> outputs;
+    QMultiHash<int,line*> *inputsH;
+    QMultiHash<int,line*> *outputsH;
+    QHash<QString,int> ModInDesign;
+    QHash<QString,QString> PortWireConnection;
+    QVector<QString> Wires;
 
 public slots:
     void help();
@@ -88,15 +94,16 @@ private slots:
     void DropModuleFromDB();
     void DropModuleFromFile();
     void ProcessModules();
-
+    void ChangeScene();
 private:
-    QGraphicsScene& canvas;
+    QGraphicsScene *canvas,*tempcanvas;
+    int Prueba;
     FigureEditor *editor;
     Core *actualItem;
     QMenu* options;
     line *toClean;
     void AddModulesToDB(Parser &);
-    void addModulo(QString , int , int , QVector<QString> &in, QVector<QString> &out);//(int x, int y, QString nombre, int cantidadEntradas, int cantidadSalidas, QString direccionImagen, QColor color, QString *in, QString *out);
+    void addModulo(QString , int , int , QVector<QString> &in, QVector<QString> &out,QMultiHash<int,line*>& Inputs, QMultiHash<int,line*> &Outputs, QList<QGraphicsTextItem*>& Modulos);//(int x, int y, QString nombre, int cantidadEntradas, int cantidadSalidas, QString direccionImagen, QColor color, QString *in, QString *out);
 #if !defined(Q_OS_SYMBIAN)
     QPrinter* printer;
 #endif

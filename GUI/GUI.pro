@@ -11,14 +11,18 @@ QT       += core gui sql
 HEADERS += canvas.h core.h line.h module.h parser.h port.h \
     fromfile.h \
     addfromdb.h \
-    busconnection.h
+    busconnection.h \
+    instance.h \
+    hierarchidialog.h
 SOURCES += canvas.cpp core.cpp line.cpp main.cpp parser.cpp \
     fromfile.cpp \
     addfromdb.cpp \
-    busconnection.cpp
+    busconnection.cpp \
+    hierarchidialog.cpp
 RESOURCES += portedcanvas.qrc
 
 FORMS += \
     fromfile.ui \
     addfromdb.ui \
-    busconnection.ui
+    busconnection.ui \
+    hierarchidialog.ui

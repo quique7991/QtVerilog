@@ -2,6 +2,7 @@
 #define MODULE_H
 #include <QVector>
 #include "port.h"
+#include "instance.h"
 class Module
 {
 public:
@@ -18,6 +19,7 @@ public:
     QString Name;
     int InputsTotal;
     int OutputsTotal;
+    Instance instances;
 };
 
 #endif // MODULE_H
